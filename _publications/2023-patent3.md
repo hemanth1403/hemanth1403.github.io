@@ -2,7 +2,7 @@
 title: "IOT BASED INTELLIGENT VEHICLE SAFETY SYSTEM"
 collection: publications
 #permalink: /publication/2009-10-01-paper-title-number-1
-permalink: /publication/2023-patent2
+permalink: /publication/2023-patent3
 excerpt: "Filed a patent on IOT BASED INTELLIGENT VEHICLE SAFETY SYSTEM - Published"
 date: 2023-11-24
 venue: "IPR - Intellectual Property India"
