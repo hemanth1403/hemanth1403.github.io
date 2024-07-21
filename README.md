@@ -1,8 +1,10 @@
 # Academic Pages
 
-![pages-build-deployment](https://github.com/academicpages/academicpages.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
+A Github Pages template for academic websites. This was forked (then detached) by Stuart Geiger from the Minimal Mistakes Jekyll Theme, which is © 2016 Michael Rose and released under the MIT License. See LICENSE.md.
 
-Academic Pages is a Github Pages template for academic websites.
+I think I've got things running smoothly and fixed some major bugs, but feel free to file issues or make pull requests if you want to improve the generic template / theme.
+
+Note: if you are using this repo and now get a notification about a security vulnerability, delete the Gemfile.lock file.
 
 # Getting Started
 
@@ -22,17 +24,21 @@ When you are initially working your website, it is very useful to be able to pre
 
 1. Clone the repository and made updates as detailed above.
 1. Make sure you have ruby-dev, bundler, and nodejs installed
-    
-    On most Linux distribution and [Windows Subsystem Linux](https://learn.microsoft.com/en-us/windows/wsl/about) the command is:
-    ```bash
-    sudo apt install ruby-dev ruby-bundler nodejs
-    ```
-    On MacOS the commands are:
-    ```bash
-    brew install ruby
-    brew install node
-    gem install bundler
-    ```
+
+   On most Linux distribution and [Windows Subsystem Linux](https://learn.microsoft.com/en-us/windows/wsl/about) the command is:
+
+   ```bash
+   sudo apt install ruby-dev ruby-bundler nodejs
+   ```
+
+   On MacOS the commands are:
+
+   ```bash
+   brew install ruby
+   brew install node
+   gem install bundler
+   ```
+
 1. Run `bundle install` to install ruby dependencies. If you get errors, delete Gemfile.lock and try again.
 1. Run `jekyll serve -l -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change.
 
