@@ -1,58 +1,10 @@
 ---
-title: "ROCK PAPER SCISSOR GAME"
+title: "ROBOT"
 #excerpt: "Developed a gesture based model for controlling the mouse virtually using media-pipe and OpenCV<br/><img src='/images/500x300.png'>"
-excerpt: "Developed a ROCK PAPER SCISSOR GAME using cvzone and OpenCV"
+excerpt: "Developed a Robot using face-recognition and OpenCV which recognizes the person and using pyttsx3 library it greets the person with a handshake and checks the temperature."
 collection: portfolio
 ---
 
-# Hand Gesture Game
+The Robot which recognises the person and differentiate them into Known or guest. And greets the person with a handshake. By the handshake it checks the person's body temperature. If his body temperature is Good then it lets them into the lab or else it cautions the person about his abnormal temperature.
 
-This project is a hand gesture-based game built using OpenCV, cvzone, and a hand detection module. The game allows a player to compete against the computer using hand gestures.
-
-## Requirements
-
-- Python 3.x
-- OpenCV (`cv2`)
-- cvzone
-- A webcam
-
-## Installation
-
-1. Install the necessary libraries:
-
-   ```bash
-   pip install opencv-python cvzone
-   ```
-
-2. Make sure you have a webcam connected to your computer.
-
-## How to Run
-
-1. Save the code in a Python file (e.g., `hand_game.py`).
-
-2. Ensure you have the required images in the `Inventory` folder:
-
-   - `BackGround.png`: The background image.
-   - `1.png`: Image representing gesture 1.
-   - `2.png`: Image representing gesture 2.
-   - `3.png`: Image representing gesture 3.
-
-3. Run the Python file:
-
-   ```bash
-   python hand_game.py
-   ```
-
-4. Press the "s" key to start the game.
-
-## How to Play
-
-- The game captures the hand gestures using the webcam.
-- The player can make one of three gestures:
-  - All fingers down (representing gesture 1).
-  - All fingers up (representing gesture 2).
-  - Index and middle fingers up (representing gesture 3).
-- The computer randomly chooses a gesture.
-- The scores are updated based on the player's gesture and the computer's choice.
-
-[Git Link](https://github.com/hemanth1403/Rock-Paper-Scissor-Game)
+[Demo](https://drive.google.com/file/d/13tZZ6YnbXg4Mi-iYcB1rWyRZcxKsa2hO/view?usp=sharing)

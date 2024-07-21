@@ -1,20 +1,58 @@
 ---
-title: "Gesture Based Operations"
+title: "ROCK PAPER SCISSOR GAME"
 #excerpt: "Developed a gesture based model for controlling the mouse virtually using media-pipe and OpenCV<br/><img src='/images/500x300.png'>"
-excerpt: "Developed a gesture-based model for controlling the mouse virtually using media-pipe and OpenCV"
+excerpt: "Developed a ROCK PAPER SCISSOR GAME using cvzone and OpenCV"
 collection: portfolio
 ---
 
-# HandGestureMouseOperations
+# Hand Gesture Game
 
-This is my first computer vision project
+This project is a hand gesture-based game built using OpenCV, cvzone, and a hand detection module. The game allows a player to compete against the computer using hand gestures.
 
-This project is mainly focused on mouse operations
+## Requirements
 
-We can perform multiple mouse operations such as mouse click operation i.e Left click, drag-drop and even volume controls
+- Python 3.x
+- OpenCV (`cv2`)
+- cvzone
+- A webcam
 
-1. Initially mouse can be controlled by using your index finger and keeping all the other fingers closed.
-2. To perform a mouse click operation initially you have to uncomment the 69th line in the AiVirtualMouseProject.py and to click you have to use only your middle and index finger and keep the rest of the fingers closed
-3. To perform volume operation you need to open your thumb and the index finger and keep all the other fingers closed, Now the distance between your thumb and the index finger determines the volume of your computer. The lesser the distance between your thumb and index finger, the lesser the volume and the greater the distance between them the higher the volume of your computer.
+## Installation
 
-[Git Link](https://github.com/hemanth1403/Hand-Gesture-Based-Mouse-Operations)
+1. Install the necessary libraries:
+
+   ```bash
+   pip install opencv-python cvzone
+   ```
+
+2. Make sure you have a webcam connected to your computer.
+
+## How to Run
+
+1. Save the code in a Python file (e.g., `hand_game.py`).
+
+2. Ensure you have the required images in the `Inventory` folder:
+
+   - `BackGround.png`: The background image.
+   - `1.png`: Image representing gesture 1.
+   - `2.png`: Image representing gesture 2.
+   - `3.png`: Image representing gesture 3.
+
+3. Run the Python file:
+
+   ```bash
+   python hand_game.py
+   ```
+
+4. Press the "s" key to start the game.
+
+## How to Play
+
+- The game captures the hand gestures using the webcam.
+- The player can make one of three gestures:
+  - All fingers down (representing gesture 1).
+  - All fingers up (representing gesture 2).
+  - Index and middle fingers up (representing gesture 3).
+- The computer randomly chooses a gesture.
+- The scores are updated based on the player's gesture and the computer's choice.
+
+[Git Link](https://github.com/hemanth1403/Rock-Paper-Scissor-Game)
