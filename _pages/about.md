@@ -6,9 +6,9 @@ author_profile: true
 redirect_from:
   - /about/
   - /about.html
+# [![Illustration of combining vision and language modalities](/images/image_to_text_vis.png){: .align-right width="300px"}] : You can add images   -> This should go after the lines
 ---
 
-[![Illustration of combining vision and language modalities](/images/image_to_text_vis.png){: .align-right width="300px"}] : You can add images
 👨🏻‍💻 I'm a B.Tech-2024 Graduate student at MLR Institute of Technology.
 
 🔬 My research interests are in Computer vision, GAN's and Reinforcement learning!
