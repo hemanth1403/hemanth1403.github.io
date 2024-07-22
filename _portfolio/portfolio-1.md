@@ -35,7 +35,7 @@ The proposed system has 2 point of views
 <h2>POV_1 : Monitoring the external environment </h2>
 
 <h3>class UML diagram</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_1/Class_UML.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Class_UML.png">
 
 <h3>Collaboration UML diagram</h3>
 <img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_1/Collaboration_UML.png">
