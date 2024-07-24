@@ -23,7 +23,7 @@ The integration aims to enhance driver safety through providing timely warnings 
 
 <h2>Proposed system</h2>
 
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Architecture%20and%20Flow%20charts/Proposed_system.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Proposed_system.png">
 
 <br>
 
@@ -38,20 +38,20 @@ The proposed system has 2 point of views
 <img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Class_UML.png">
 
 <h3>Collaboration UML diagram</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_1/Collaboration_UML.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Collaboration_UML.png">
 
 <h3>Sequence UML diagram</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_1/Sequence_UML.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Sequence_UML.png">
 
 <h3>Usecase UML Diagram</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_1/UseCase_UML.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/UseCase_UML.png">
 
 <h2>POV_2 : Monitoring the internal environment </h2>
 <h3>UML diagram</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/UML%20Diagrams/POV_2/Drowsiness.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_2/Drowsiness.png">
 
 <h3>Psudo code</h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Architecture%20and%20Flow%20charts/Psudo_Drowsiness.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Psudo_Drowsiness.png">
 
 <h2>Code setup : </h2>
 <h3>Requirements : </h3>
@@ -161,7 +161,7 @@ The proposed system has 2 point of views
 &nbsp  &nbsp &nbsp 11. 12v 2A Power supply <br>
 &nbsp  &nbsp &nbsp 12. 15 pin to 22 pin cable <br>
 <h3>Hardware Integration : </h3>
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Architecture%20and%20Flow%20charts/Hardware.jpg">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Hardware.jpg">
 
 <h2>Results : </h2>
 
@@ -169,15 +169,15 @@ The proposed system has 2 point of views
 
 1. Front Collision Warning System :
 
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Results/Screenshot%202024-04-15%20at%2012.17.36%E2%80%AFAM.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.17.36%E2%80%AFAM.png">
 
 2. Lane Departure Warning System :
 
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Results/Screenshot%202024-04-15%20at%2012.20.14%E2%80%AFAM.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.20.14%E2%80%AFAM.png">
 
 3. Lane Keeping Assist System :
 
-<img src= "https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Results/Screenshot%202024-04-15%20at%2012.14.07%E2%80%AFAM.png">
+<img src= "https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.14.07%E2%80%AFAM.png">
 
 <h3>POV_2 : Monitoring the internal environment</h3>
 
@@ -185,11 +185,11 @@ The proposed system has 2 point of views
 
 1.  Active driver :
 
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Results/Screenshot%202024-02-21%20at%207.49.40%E2%80%AFPM.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-02-21%20at%207.49.40%E2%80%AFPM.png">
 
 2.  Drowsy driver :
 
-<img src="https://github.com/hemanth1403/Driver-Assistance-System/blob/main/Results/Screenshot%202024-02-21%20at%207.50.26%E2%80%AFPM.png">
+<img src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-02-21%20at%207.50.26%E2%80%AFPM.png">
 <br>
 
 <h4>This repository contains the submission for our project by Madadapu HemanthSai and Team, B. Tech CSE - AIML student from MLR Institute of Technology. The project encompasses solutions to problems demonstrating proficiency in machine learning and computer vision.</h4>
