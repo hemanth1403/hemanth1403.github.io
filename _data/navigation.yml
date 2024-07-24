@@ -2,7 +2,7 @@
 main:
   - title: "CV"
     #url: /cv/
-    url: /files/Resume(21.07.24).pdf
+    url: /files/Resume(24.07.24).pdf
 
   - title: "Publications"
     url: /publications/
