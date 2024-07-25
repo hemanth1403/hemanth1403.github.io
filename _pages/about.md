@@ -7,15 +7,10 @@ redirect_from:
   - /about/
   - /about.html
 # [![Illustration of combining vision and language modalities](/images/image_to_text_vis.png){: .align-right width="300px"}] : You can add images   -> This should go after the lines
----
 
-👨🏻‍💻 I'm a B.Tech-2024 Graduate student at MLR Institute of Technology.
 
-🔬 My research interests are in Computer vision, GAN's and Reinforcement learning!
-
-📚 I'm currently working on a Computer vision project involving small object detection.
-
-📽️ I am also interested in assisting others on their path in the world of Machine Learning and academia.
+"""
+-> This should go after the lines
 
 # Selected Experience
 
@@ -42,3 +37,15 @@ There I worked on dynamic traffic flow forecasting using Graph Neural Networks.
 ## 📚 Teaching and Community Contributions
 
 To further contribute to the Machine Learning community, I have a [YouTube](https://www.youtube.com/@borismeinardus) and [Medium](https://medium.com/@boris.meinardus) channel where I publish educational Machine Learning content.
+"""
+
+
+---
+
+👨🏻‍💻 I'm a B.Tech-2024 Graduate student at MLR Institute of Technology.
+
+🔬 My research interests are in Computer vision, GAN's and Reinforcement learning!
+
+📚 I'm currently working on a Computer vision project involving small object detection.
+
+📽️ I am also interested in assisting others on their path in the world of Machine Learning and academia.
