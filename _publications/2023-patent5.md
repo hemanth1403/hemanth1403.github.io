@@ -2,7 +2,7 @@
 title: "PREDICTION OF BIRDS AND ANALYSIS OF ENDANGERED BIRD SPECIES"
 collection: publications
 #permalink: /publication/2009-10-01-paper-title-number-1
-permalink: /publication/2023-patent4
+permalink: /publication/2023-patent5
 excerpt: "Filed a patent on PREDICTION OF BIRDS AND ANALYSIS OF ENDANGERED BIRD SPECIES - Published"
 date: 2023-11-24
 venue: "IPR - Intellectual Property India"
