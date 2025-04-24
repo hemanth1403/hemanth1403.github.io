@@ -35,7 +35,7 @@ redirect_from:
 # To further contribute to the Machine Learning community, I have a [YouTube](https://www.youtube.com/@borismeinardus) and [Medium](https://medium.com/@boris.meinardus) channel where I publish educational Machine Learning content.
 ---
 
-👨🏻‍💻 I'm a Masters student in Northeastern University persuing majors in Artificial Intelligence.
+👨🏻‍💻 I'm a Masters student in Northeastern University pursuing majors in Artificial Intelligence.
 
 🔬 My research interests are in Computer vision, GAN's and Reinforcement learning!
 
