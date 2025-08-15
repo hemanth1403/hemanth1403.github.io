@@ -201,6 +201,9 @@ collections:
   portfolio:
     output: true
     permalink: /:collection/:path/
+  workExperience:
+    output: true
+    permalink: /:collections/:path/
   talks:
     output: true
     permalink: /:collection/:path/
@@ -247,6 +250,15 @@ defaults:
   - scope:
       path: ""
       type: portfolio
+    values:
+      layout: single
+      author_profile: true
+      share: true
+      comment: true
+  # _workExperience
+  - scope:
+      path: ""
+      type: workExperience
     values:
       layout: single
       author_profile: true
