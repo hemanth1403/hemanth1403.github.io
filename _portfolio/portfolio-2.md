@@ -1,7 +1,7 @@
 ---
 title: "ROBOT"
 #excerpt: "Developed a gesture based model for controlling the mouse virtually using media-pipe and OpenCV<br/><img src='/images/500x300.png'>"
-excerpt: "Developed a Robot using face-recognition and OpenCV which recognizes the person and using pyttsx3 library it greets the person with a handshake and checks the temperature."
+excerpt: "Developed a change Robot using face-recognition and OpenCV which recognizes the person and using pyttsx3 library it greets the person with a handshake and checks the temperature."
 collection: portfolio
 ---
 
