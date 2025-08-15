@@ -203,7 +203,7 @@ collections:
     permalink: /:collection/:path/
   workExperience:
     output: true
-    permalink: /:collections/:path/
+    permalink: /:collection/:path/
   talks:
     output: true
     permalink: /:collection/:path/
@@ -260,7 +260,7 @@ defaults:
       path: ""
       type: workExperience
     values:
-      layout: single
+      layout: workExperience
       author_profile: true
       share: true
       comment: true
