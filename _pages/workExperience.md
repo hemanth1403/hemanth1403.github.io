@@ -5,6 +5,13 @@ permalink: /workExperience/
 author_profile: true
 ---
 
-<ul>{% for post in site.workExperience reversed %}
-  {% include archive-single.html %}
-{% endfor %}</ul>
+{% if site.author.googlescholar %}
+
+  <div class="wordwrap">You can also find my articles on <a href="{{site.author.googlescholar}}">my Google Scholar profile</a>.</div>
+{% endif %}
+
+{% include base_path %}
+
+{% for post in site.workExperience reversed %}
+{% include archive-single.html %}
+{% endfor %}
