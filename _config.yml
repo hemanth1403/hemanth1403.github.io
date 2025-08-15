@@ -260,7 +260,7 @@ defaults:
       path: ""
       type: workExperience
     values:
-      layout: workExperience
+      layout: single
       author_profile: true
       share: true
       comment: true
