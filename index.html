@@ -618,7 +618,35 @@
       letter-spacing: 0.05em;
     }
 
-    /* ───── PROJECTS ───── */
+    .tl-terms {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .tl-term {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(240, 180, 41, 0.08);
+      border: 0.5px solid rgba(240, 180, 41, 0.2);
+      border-radius: 4px;
+      padding: 3px 10px;
+    }
+
+    .tl-term-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-top: 4px;
+    }
+
+
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1421,7 +1449,7 @@
       </h1>
 
       <div class="hero-title">
-        MS Artificial Intelligence · Khoury College of Computer Science <br><span class="hl">Northeastern
+        MS Artificial Intelligence · Khoury College of Computer Science <br> <span class="hl">Northeastern
           University</span> · Expected May 2027
       </div>
 
@@ -1632,7 +1660,11 @@
 
       <div class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta">Jan 2025 – Present</div>
+        <div class="tl-term-label">Two terms</div>
+        <div class="tl-terms">
+          <span class="tl-term">Aug 2025 – Oct 2025</span>
+          <span class="tl-term">Jan 2026 – Feb 2026</span>
+        </div>
         <div class="tl-role">Instructional Assistant</div>
         <div class="tl-company">Northeastern University · Boston, MA</div>
         <p class="tl-body">Providing real-time technical and AV support to professors during classroom instruction at
@@ -1647,8 +1679,8 @@
 
       <div class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta">2023 – 2024</div>
-        <div class="tl-role">Project Lead — FOD Detection</div>
+        <div class="tl-meta">Jan 2024 – Dec 2024</div>
+        <div class="tl-role">Project Lead - AI/ML Engineering</div>
         <div class="tl-company">Indian Air Force Academy · Hyderabad, India</div>
         <p class="tl-body">Led the design and deployment of an autonomous Foreign Object Debris detection vehicle to
           enhance runway safety. Built a custom YOLOv8 model with hyperparameter tuning deployed on NVIDIA Jetson Xavier
@@ -1666,9 +1698,9 @@
 
       <div class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta">2023</div>
+        <div class="tl-meta">March 2023 – Jun 2023</div>
         <div class="tl-role">Machine Learning Intern</div>
-        <div class="tl-company">Sclanet AI · Hyderabad, India</div>
+        <div class="tl-company">Sclanet AI · Texas, United States</div>
         <p class="tl-body">Designed and executed a full computer vision pipeline for retail shelf product detection.
           Defined image collection criteria, annotated datasets with LabelImg, and stored data on Amazon S3 while
           product metadata was ingested into MongoDB. Built a custom TensorFlow Object Detection API model using
@@ -1683,8 +1715,8 @@
 
       <div class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta">2022</div>
-        <div class="tl-role">AI Engineering Intern</div>
+        <div class="tl-meta">March 2022 – Jun 2022</div>
+        <div class="tl-role">Robotics Engineering Intern</div>
         <div class="tl-company">HBots · Hyderabad, India</div>
         <p class="tl-body">Designed and built a greeting robot combining facial recognition, computer vision, and IoT
           hardware. Implemented OpenCV for visual processing, reducing processing time by 25%, and used SVMs for facial
@@ -1725,8 +1757,7 @@
         <div class="project-links">
           <a href="https://github.com/hemanth1403/Driver-Assistance-System" target="_blank" class="proj-link">↗
             GitHub</a>
-          <a href="https://hemanth1403.github.io/portfolio/portfolio-1/" target="_blank"
-            class="proj-link secondary">Details</a>
+          <a href="projects/driver-assistance.html" class="proj-link secondary">Details</a>
         </div>
       </div>
 
@@ -1746,8 +1777,7 @@
         <div class="project-links">
           <a href="https://drive.google.com/file/d/13tZZ6YnbXg4Mi-iYcB1rWyRZcxKsa2hO/view?usp=sharing" target="_blank"
             class="proj-link">↗ Demo</a>
-          <a href="https://hemanth1403.github.io/portfolio/portfolio-2/" target="_blank"
-            class="proj-link secondary">Details</a>
+          <a href="projects/greeting-robot.html" class="proj-link secondary">Details</a>
         </div>
       </div>
 
@@ -1799,8 +1829,7 @@
           <span class="project-tag">Patented</span>
         </div>
         <div class="project-links">
-          <a href="https://hemanth1403.github.io/portfolio/portfolio-5/" target="_blank"
-            class="proj-link secondary">Details</a>
+          <a href="projects/crop-rover.html" class="proj-link secondary">Details</a>
         </div>
       </div>
 
@@ -1914,7 +1943,7 @@
     <div class="blog-grid">
 
       <!-- First real post placeholder — fill in when ready -->
-      <a href="#" class="blog-card reveal" onclick="return false;" style="cursor:default;">
+      <!-- <a href="#" class="blog-card reveal" onclick="return false;" style="cursor:default;">
         <div class="blog-meta">
           <span class="blog-topic">Computer Vision</span>
           <span>Coming soon</span>
@@ -1925,9 +1954,9 @@
         <div class="blog-footer">
           <span class="blog-read-time">~8 min read</span>
         </div>
-      </a>
+      </a> -->
 
-      <a href="#" class="blog-card reveal reveal-delay-1" onclick="return false;" style="cursor:default;">
+      <!-- <a href="#" class="blog-card reveal reveal-delay-1" onclick="return false;" style="cursor:default;">
         <div class="blog-meta">
           <span class="blog-topic blue">Deep Learning</span>
           <span>Coming soon</span>
@@ -1938,7 +1967,7 @@
         <div class="blog-footer">
           <span class="blog-read-time">~6 min read</span>
         </div>
-      </a>
+      </a> -->
 
       <a href="blog/ubuntu-g14-rtx5060.html" class="blog-card reveal reveal-delay-2">
         <div class="blog-meta">
@@ -1978,7 +2007,7 @@
   </section>
 
   <footer>
-    <span class="footer-copy">© 2025 Hemanth Sai .M</span>
+    <span class="footer-copy">© 2026 Hemanth Sai .M</span>
     <span class="footer-made">Built with precision · Boston, MA</span>
   </footer>
 
