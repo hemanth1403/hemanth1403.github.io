@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Assistance System — Hemanth Sai</title>
+  <meta name="description"
+    content="A full ADAS suite — drowsiness detection, lane detection, collision warning — deployed on Jetson hardware with real-time inference.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05060f;
+      --bg2: #0b0c1e;
+      --bg3: #111328;
+      --bg4: #181a35;
+      --gold: #f0b429;
+      --gold2: #ffd060;
+      --blue: #38bdf8;
+      --green: #4ade80;
+      --text: #eceaf5;
+      --muted: #7a7d9a;
+      --border: rgba(240, 180, 41, 0.10);
+      --border2: rgba(240, 180, 41, 0.20);
+      --r: 12px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      line-height: 1.8;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 2px
+    }
+
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--blue));
+      z-index: 1000;
+      transition: width 0.1s;
+      box-shadow: 0 0 8px var(--gold)
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      padding: 18px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5, 6, 15, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid var(--border)
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em
+    }
+
+    .nav-logo span {
+      color: var(--gold)
+    }
+
+    .nav-back {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s
+    }
+
+    .nav-back:hover {
+      color: var(--gold)
+    }
+
+    .post-hero {
+      padding: 140px 5vw 80px;
+      max-width: 900px;
+      margin: 0 auto
+    }
+
+    .post-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .post-eyebrow .dot {
+      width: 3px;
+      height: 3px;
+      background: var(--muted);
+      border-radius: 50%
+    }
+
+    .tag-pill {
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.06em
+    }
+
+    .tag-pill.gold {
+      background: rgba(240, 180, 41, 0.08);
+      border: 0.5px solid rgba(240, 180, 41, 0.2);
+      color: var(--gold)
+    }
+
+    .tag-pill.blue {
+      background: rgba(56, 189, 248, 0.08);
+      border: 0.5px solid rgba(56, 189, 248, 0.2);
+      color: var(--blue)
+    }
+
+    .post-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 24px
+    }
+
+    .post-title em {
+      color: var(--gold);
+      font-style: normal
+    }
+
+    .post-subtitle {
+      font-size: 18px;
+      color: rgba(236, 234, 245, 0.6);
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 40px
+    }
+
+    .post-meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 18px 0;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 64px
+    }
+
+    .meta-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .meta-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border2)
+    }
+
+    article {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 5vw 100px
+    }
+
+    .section-head {
+      margin: 64px 0 24px
+    }
+
+    .section-head-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .section-head-label::before {
+      content: '';
+      width: 16px;
+      height: 1px;
+      background: var(--gold)
+    }
+
+    h2.section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.2
+    }
+
+    h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+      margin: 40px 0 14px;
+      letter-spacing: -0.01em
+    }
+
+    p {
+      color: rgba(236, 234, 245, 0.78);
+      font-size: 17px;
+      line-height: 1.82;
+      font-weight: 300;
+      margin-bottom: 20px
+    }
+
+    p strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    p em {
+      color: var(--gold);
+      font-style: normal
+    }
+
+    p a {
+      color: var(--blue);
+      text-decoration: none;
+      border-bottom: 0.5px solid rgba(56, 189, 248, 0.3);
+      transition: border-color 0.2s
+    }
+
+    p a:hover {
+      border-color: var(--blue)
+    }
+
+    /* Component cards */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 24px 0 36px
+    }
+
+    .component-card {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      transition: border-color 0.3s, transform 0.2s
+    }
+
+    .component-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px)
+    }
+
+    .component-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px
+    }
+
+    .component-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 6px
+    }
+
+    .component-desc {
+      font-size: 13px;
+      color: rgba(236, 234, 245, 0.55);
+      line-height: 1.55;
+      font-weight: 300
+    }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r);
+      margin: 24px 0;
+      overflow: hidden
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg3)
+    }
+
+    .code-lang {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .code-lang .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%
+    }
+
+    .dot-bash {
+      background: #4ade80
+    }
+
+    .dot-py {
+      background: #60a5fa
+    }
+
+    .copy-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 0.5px solid var(--border2);
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: color 0.2s
+    }
+
+    .copy-btn:hover {
+      color: var(--gold)
+    }
+
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      margin: 0
+    }
+
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text)
+    }
+
+    p code,
+    li code {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 2px 7px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      border-radius: 4px;
+      color: var(--gold)
+    }
+
+    .comment {
+      color: var(--muted)
+    }
+
+    .cmd {
+      color: #c084fc
+    }
+
+    .flag {
+      color: var(--blue)
+    }
+
+    .string {
+      color: #86efac
+    }
+
+    /* Metrics row */
+    .metrics-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0
+    }
+
+    .metric-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 8px 16px;
+      background: rgba(240, 180, 41, 0.08);
+      border: 0.5px solid rgba(240, 180, 41, 0.2);
+      border-radius: 8px;
+      color: var(--gold);
+      letter-spacing: 0.05em
+    }
+
+    .metric-badge span {
+      display: block;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    /* Image display */
+    .project-img {
+      width: 100%;
+      border-radius: var(--r);
+      border: 0.5px solid var(--border);
+      margin: 20px 0;
+      background: var(--bg2)
+    }
+
+    .img-caption {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-top: -12px;
+      margin-bottom: 24px
+    }
+
+    /* Hardware list */
+    .hw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 20px 0 32px
+    }
+
+    .hw-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      padding: 8px 14px;
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .hw-item::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0
+    }
+
+    /* POV section */
+    .pov-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px
+    }
+
+    .pov-tab {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 8px 20px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent
+    }
+
+    .pov-tab.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+      font-weight: 500
+    }
+
+    /* Callout */
+    .callout {
+      border-left: 2px solid var(--gold);
+      background: rgba(240, 180, 41, 0.05);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 16px 20px;
+      margin: 28px 0
+    }
+
+    .callout-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--gold)
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(236, 234, 245, 0.7)
+    }
+
+    /* Links section */
+    .project-links-bar {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 20px
+    }
+
+    .proj-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 10px 22px;
+      border-radius: var(--r);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .proj-btn.primary {
+      background: var(--gold);
+      color: var(--bg)
+    }
+
+    .proj-btn.primary:hover {
+      background: var(--gold2)
+    }
+
+    .proj-btn.outline {
+      border: 0.5px solid var(--border2);
+      color: var(--text)
+    }
+
+    .proj-btn.outline:hover {
+      border-color: var(--gold);
+      background: rgba(240, 180, 41, 0.06);
+      color: var(--gold)
+    }
+
+    /* Conclusion */
+    .conclusion {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      margin-top: 64px
+    }
+
+    .conclusion-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 14px
+    }
+
+    .conclusion-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 12px
+    }
+
+    .conclusion p {
+      font-size: 16px;
+      margin-bottom: 0;
+      line-height: 1.7
+    }
+
+    /* Post footer */
+    .post-footer {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 5vw 80px;
+      border-top: 0.5px solid var(--border);
+      padding-top: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap
+    }
+
+    .author-card {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--gold)
+    }
+
+    .author-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text)
+    }
+
+    .author-role {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: 2px
+    }
+
+    .back-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 11px 22px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: all 0.2s
+    }
+
+    .back-btn:hover {
+      border-color: var(--gold);
+      background: rgba(240, 180, 41, 0.06);
+      color: var(--gold)
+    }
+
+    .fade {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)
+    }
+
+    .fade.visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    @media(max-width:640px) {
+      .post-hero {
+        padding: 110px 5vw 48px
+      }
+
+      .post-title {
+        font-size: clamp(24px, 7vw, 36px)
+      }
+
+      article {
+        padding: 0 5vw 60px
+      }
+
+      .hw-grid {
+        grid-template-columns: 1fr
+      }
+
+      .components-grid {
+        grid-template-columns: 1fr
+      }
+
+      .metrics-row {
+        gap: 8px
+      }
+
+      .post-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 32px 5vw 48px
+      }
+
+      .post-meta-bar {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .meta-divider {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="progress"></div>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">HM<span>.</span></a>
+    <a href="../index.html#projects" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+      All Projects
+    </a>
+  </nav>
+
+  <div class="post-hero fade">
+    <div class="post-eyebrow">
+      <span class="tag-pill gold">Computer Vision</span>
+      <span class="tag-pill gold">Edge AI</span>
+      <span class="tag-pill blue">B.Tech Final Year</span>
+      <span class="dot"></span>
+      <span>2024</span>
+      <span class="dot"></span>
+      <span>Major Project</span>
+    </div>
+    <h1 class="post-title">Driver <em>Assistance</em> System</h1>
+    <p class="post-subtitle">A complete ADAS suite — six integrated safety systems monitoring both the road and the
+      driver, running real-time on edge hardware.</p>
+    <div class="post-meta-bar">
+      <div class="meta-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2" />
+          <path d="M6.5 3.5V6.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+        B.Tech Final Year · 2024
+      </div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">MLR Institute of Technology</div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">YOLOv8 · OpenCV · TensorRT · Jetson Orin Nano</div>
+    </div>
+  </div>
+
+  <article>
+
+    <p class="fade">Road safety is one of the leading causes of injury and death globally. This project addresses it by
+      building a complete <strong>Advanced Driver Assistance System (ADAS)</strong> that monitors both the road and the
+      driver simultaneously — alerting in real-time and even taking corrective action when needed.</p>
+
+    <div class="section-head fade">
+      <div class="section-head-label">System Overview</div>
+      <h2 class="section-title">Six integrated safety components</h2>
+    </div>
+
+    <div class="components-grid">
+      <div class="component-card fade">
+        <div class="component-num">01</div>
+        <div class="component-name">Drowsiness Detection</div>
+        <div class="component-desc">Monitors Eye Aspect Ratio (EAR) throughout the ride to detect fatigue and alert the
+          driver before it becomes dangerous.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">02</div>
+        <div class="component-name">Lane Detection</div>
+        <div class="component-desc">Ultrafast lane detector provides real-time spatial awareness by recognising road
+          markings in all conditions.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">03</div>
+        <div class="component-name">Lane Departure Warning</div>
+        <div class="component-desc">Triggers an alert the moment the vehicle deviates from its lane without signalling.
+        </div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">04</div>
+        <div class="component-name">Lane Keeping Assist</div>
+        <div class="component-desc">Detects continued lane deviation and feeds corrections to the vehicle's steering
+          system to bring it back.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">05</div>
+        <div class="component-name">Object Detection</div>
+        <div class="component-desc">YOLO-based recognition of pedestrians, vehicles, and road objects in real time
+          across both close and far range.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">06</div>
+        <div class="component-name">Collision Warning</div>
+        <div class="component-desc">Combines OpenCV distance measurement with object detection to alert the driver about
+          imminent collision risks.</div>
+      </div>
+    </div>
+
+    <div class="section-head fade">
+      <div class="section-head-label">Architecture</div>
+      <h2 class="section-title">Two points of view</h2>
+    </div>
+
+    <p class="fade">The system operates with two independent camera perspectives running concurrently:</p>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Proposed_system.png"
+      alt="Proposed system architecture" loading="lazy">
+    <div class="img-caption fade">Overall proposed system architecture</div>
+
+    <h3 class="fade">POV 1 — Monitoring the external environment</h3>
+    <p class="fade">Handles lane tracking, object detection, and collision warning. Three UML diagrams define the class
+      relationships, collaboration, and use-case flows.</p>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Class_UML.png"
+      alt="Class UML diagram" loading="lazy">
+    <div class="img-caption fade">Class UML — POV 1 external environment</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_1/Sequence_UML.png"
+      alt="Sequence UML diagram" loading="lazy">
+    <div class="img-caption fade">Sequence UML — request-response flow</div>
+
+    <h3 class="fade">POV 2 — Monitoring the internal environment</h3>
+    <p class="fade">Handles drowsiness detection using Eye Aspect Ratio (EAR). If EAR drops below a threshold for a
+      sustained period, the system triggers an alert.</p>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/UML%20Diagrams/POV_2/Drowsiness.png"
+      alt="Drowsiness detection UML" loading="lazy">
+    <div class="img-caption fade">Drowsiness detection UML diagram</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Psudo_Drowsiness.png"
+      alt="Drowsiness pseudo code" loading="lazy">
+    <div class="img-caption fade">Drowsiness detection algorithm pseudocode</div>
+
+    <div class="section-head fade">
+      <div class="section-head-label">Results</div>
+      <h2 class="section-title">System in action</h2>
+    </div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.17.36%E2%80%AFAM.png"
+      alt="Front collision warning" loading="lazy">
+    <div class="img-caption fade">Front Collision Warning System — live detection</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.20.14%E2%80%AFAM.png"
+      alt="Lane departure warning" loading="lazy">
+    <div class="img-caption fade">Lane Departure Warning System — deviation alert</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-04-15%20at%2012.14.07%E2%80%AFAM.png"
+      alt="Lane keeping assist" loading="lazy">
+    <div class="img-caption fade">Lane Keeping Assist System — steering correction</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-02-21%20at%207.49.40%E2%80%AFPM.png"
+      alt="Active driver" loading="lazy">
+    <div class="img-caption fade">POV 2 — Active, alert driver (normal EAR)</div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Results/Screenshot%202024-02-21%20at%207.50.26%E2%80%AFPM.png"
+      alt="Drowsy driver" loading="lazy">
+    <div class="img-caption fade">POV 2 — Drowsy driver detected (low EAR threshold)</div>
+
+    <div class="section-head fade">
+      <div class="section-head-label">Hardware</div>
+      <h2 class="section-title">Jetson-powered edge deployment</h2>
+    </div>
+
+    <div class="hw-grid fade">
+      <div class="hw-item">Jetson Orin Nano</div>
+      <div class="hw-item">Pi Camera Module 3</div>
+      <div class="hw-item">Servo Motor</div>
+      <div class="hw-item">Arduino Nano</div>
+      <div class="hw-item">ADXL-345 (Accelerometer)</div>
+      <div class="hw-item">GPS Neo-6m</div>
+      <div class="hw-item">GSM SIM800I</div>
+      <div class="hw-item">LM2596 Step Converter</div>
+      <div class="hw-item">Power Bank (10–20 000 mAh)</div>
+      <div class="hw-item">12V 2A Power Supply</div>
+    </div>
+
+    <img class="project-img fade"
+      src="https://raw.githubusercontent.com/hemanth1403/Driver-Assistance-System/main/Architecture%20and%20Flow%20charts/Hardware.jpg"
+      alt="Hardware integration diagram" loading="lazy">
+    <div class="img-caption fade">Full hardware integration schematic</div>
+
+    <div class="section-head fade">
+      <div class="section-head-label">Setup</div>
+      <h2 class="section-title">Running the project</h2>
+    </div>
+
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div> Bash
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="comment"># Install dependencies</span>
+<span class="cmd">pip</span> install <span class="flag">-r</span> requirements.txt
+
+<span class="comment"># Run POV_1 — external environment monitoring</span>
+<span class="cmd">python</span> demo.py
+
+<span class="comment"># Run POV_2 — drowsiness detection (from Drowsiness detector dir)</span>
+<span class="cmd">python</span> detect.py</code></pre>
+    </div>
+
+    <h3 class="fade">YOLO model conversion</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div> Bash
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="comment"># Convert ONNX model to TensorRT for edge deployment</span>
+<span class="cmd">python</span> convertOnnxToTensorRT.py <span class="flag">-i</span> &lt;onnx-model&gt; <span class="flag">-o</span> &lt;trt-model&gt;
+
+<span class="comment"># Quantize to float16 to reduce model size</span>
+<span class="cmd">python</span> onnxQuantization.py <span class="flag">-i</span> &lt;onnx-model&gt;</code></pre>
+    </div>
+
+    <div class="conclusion fade">
+      <div class="conclusion-label">Outcome</div>
+      <div class="conclusion-title">A safety system that thinks faster than the driver can react.</div>
+      <p>This project demonstrates that a comprehensive ADAS suite — normally found in premium vehicles — can be built
+        and deployed on affordable edge hardware like the Jetson Orin Nano. The dual-POV architecture means the system
+        simultaneously watches the road and the driver, providing layered protection that neither a human nor a
+        single-camera system can match alone.</p>
+      <div class="project-links-bar" style="margin-top:24px">
+        <a href="https://github.com/hemanth1403/Driver-Assistance-System" target="_blank" class="proj-btn primary">↗
+          View on GitHub</a>
+      </div>
+    </div>
+
+  </article>
+
+  <div class="post-footer fade">
+    <div class="author-card">
+      <div class="author-avatar">HM</div>
+      <div>
+        <div class="author-name">Hemanth Sai .M</div>
+        <div class="author-role">MS AI · Northeastern University</div>
+      </div>
+    </div>
+    <a href="../index.html#projects" class="back-btn">← Back to Projects</a>
+  </div>
+
+  <script>
+    const bar = document.getElementById('progress');
+    window.addEventListener('scroll', () => {
+      bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+    });
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.08 });
+    document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+    function copyCode(btn) {
+      const text = btn.closest('.code-block').querySelector('pre').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!'; btn.style.color = '#4ade80';
+        setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1800);
+      });
+    }
+  </script>
+</body>
+
+</html>
