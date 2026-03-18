@@ -1,318 +1,1069 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ubuntu 24.04 on ASUS ROG G14 with RTX 5060 — Hemanth Sai</title>
-<meta name="description" content="Complete battle-tested guide — bootable USB with balenaEtcher &amp; Rufus, Ubuntu 24.04.4 LTS on ASUS ROG G14 with RTX 5060 Blackwell, CUDA 13.0, PyTorch 2.10, asusctl from source, brightness fix, ROG Control Center.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{--bg:#05060f;--bg2:#0b0c1e;--bg3:#111328;--bg4:#181a35;--gold:#f0b429;--gold2:#ffd060;--blue:#38bdf8;--green:#4ade80;--text:#eceaf5;--muted:#7a7d9a;--border:rgba(240,180,41,0.10);--border2:rgba(240,180,41,0.20);--r:12px}
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:17px;line-height:1.8;overflow-x:hidden}
-  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
-  #progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--blue));z-index:1000;transition:width 0.1s;box-shadow:0 0 8px var(--gold)}
-  nav{position:fixed;top:0;left:0;right:0;z-index:900;padding:18px 5vw;display:flex;align-items:center;justify-content:space-between;background:rgba(5,6,15,0.92);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border)}
-  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:0.02em}
-  .nav-logo span{color:var(--gold)}
-  .nav-back{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:color 0.2s}
-  .nav-back:hover{color:var(--gold)}
-  .post-hero{padding:140px 5vw 80px;max-width:860px;margin:0 auto}
-  .post-eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .post-eyebrow .dot{width:3px;height:3px;background:var(--muted);border-radius:50%}
-  .tag-pill{padding:3px 10px;border-radius:4px;letter-spacing:0.06em;font-family:'DM Mono',monospace;font-size:11px}
-  .tag-pill.gold{background:rgba(240,180,41,0.08);border:0.5px solid rgba(240,180,41,0.2);color:var(--gold)}
-  .tag-pill.blue{background:rgba(56,189,248,0.08);border:0.5px solid rgba(56,189,248,0.2);color:var(--blue)}
-  .tag-pill.green{background:rgba(74,222,128,0.08);border:0.5px solid rgba(74,222,128,0.2);color:var(--green)}
-  .post-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,5vw,52px);line-height:1.08;letter-spacing:-0.02em;color:var(--text);margin-bottom:24px}
-  .post-title em{color:var(--gold);font-style:normal}
-  .post-subtitle{font-size:18px;color:rgba(236,234,245,0.6);font-weight:300;line-height:1.6;max-width:660px;margin-bottom:40px}
-  .post-meta-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:18px 0;border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);margin-bottom:64px}
-  .meta-item{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
-  .meta-divider{width:1px;height:14px;background:var(--border2)}
-  .spec-table{width:100%;border-collapse:collapse;margin:0 0 36px;font-size:14px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
-  .spec-table td{padding:11px 16px;border-bottom:0.5px solid var(--border)}
-  .spec-table tr:last-child td{border-bottom:none}
-  .spec-table td:first-child{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;width:160px}
-  .spec-table td:last-child{color:var(--text);font-weight:500}
-  article{max-width:720px;margin:0 auto;padding:0 5vw 100px}
-  .phase{margin:64px 0 24px}
-  .phase-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-  .phase-label::before{content:'';width:16px;height:1px;background:var(--gold)}
-  h2.phase-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(20px,3vw,28px);color:var(--text);letter-spacing:-0.01em;line-height:1.2}
-  h3{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin:40px 0 14px;letter-spacing:-0.01em}
-  p{color:rgba(236,234,245,0.78);font-size:17px;line-height:1.82;font-weight:300;margin-bottom:20px}
-  p strong{color:var(--text);font-weight:600}
-  .callout{border-left:2px solid var(--gold);background:rgba(240,180,41,0.05);border-radius:0 var(--r) var(--r) 0;padding:16px 20px;margin:28px 0}
-  .callout.info{border-color:var(--blue);background:rgba(56,189,248,0.05)}
-  .callout.warn{border-color:#f87171;background:rgba(248,113,113,0.05)}
-  .callout.success{border-color:var(--green);background:rgba(74,222,128,0.05)}
-  .callout-label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;margin-bottom:6px;color:var(--gold)}
-  .callout.info .callout-label{color:var(--blue)}
-  .callout.warn .callout-label{color:#f87171}
-  .callout.success .callout-label{color:var(--green)}
-  .callout p{margin:0;font-size:15px;line-height:1.65;color:rgba(236,234,245,0.7)}
-  .code-block{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);margin:24px 0;overflow:hidden}
-  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:0.5px solid var(--border);background:var(--bg3)}
-  .code-lang{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-  .code-lang .dot{width:8px;height:8px;border-radius:50%}
-  .dot-bash{background:#4ade80}.dot-py{background:#60a5fa}.dot-ini{background:var(--gold)}
-  .copy-btn{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:0.5px solid var(--border2);border-radius:4px;padding:3px 10px;cursor:pointer;transition:color 0.2s}
-  .copy-btn:hover{color:var(--gold)}
-  pre{padding:20px;overflow-x:auto;margin:0}
-  code{font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;color:var(--text)}
-  p code,li code{font-family:'DM Mono',monospace;font-size:13px;padding:2px 7px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:4px;color:var(--gold)}
-  .cm{color:var(--muted)}.ck{color:#c084fc}.fl{color:var(--blue)}.st{color:#86efac}.ot{color:var(--gold)}
-  .checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin:20px 0 28px}
-  .checklist li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:rgba(236,234,245,0.75);line-height:1.6}
-  .checklist li::before{content:'✓';color:var(--green);font-family:'DM Mono',monospace;font-size:13px;flex-shrink:0;margin-top:2px}
-  .checklist li strong{color:var(--text)}
-  .part-table{width:100%;border-collapse:collapse;margin:20px 0 32px;font-size:13px}
-  .part-table th{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;text-align:left;padding:10px 12px;border-bottom:0.5px solid var(--border2)}
-  .part-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);color:rgba(236,234,245,0.75);vertical-align:top;line-height:1.5}
-  .part-table tr:last-child td{border-bottom:none}
-  .part-table td:first-child{font-family:'DM Mono',monospace;font-size:12px;color:var(--blue)}
-  .bk{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(74,222,128,0.1);border:0.5px solid rgba(74,222,128,0.3);color:var(--green)}
-  .bf{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);color:#f87171}
-  .final-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
-  .fi{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:flex-start;gap:10px}
-  .fi::before{content:'✓';color:var(--green);font-family:'DM Mono',monospace;font-size:12px;flex-shrink:0;margin-top:1px}
-  .fi-t{font-size:13px;color:rgba(236,234,245,0.75);line-height:1.5}
-  .fi-t strong{color:var(--text);display:block;margin-bottom:2px}
-  .conclusion{background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:36px;margin-top:64px}
-  .conclusion-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px}
-  .conclusion-title{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--text);margin-bottom:12px}
-  .conclusion p{font-size:16px;margin-bottom:0;line-height:1.7}
-  .post-footer{max-width:720px;margin:0 auto;padding:40px 5vw 80px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
-  .author-card{display:flex;align-items:center;gap:14px}
-  .author-avatar{width:44px;height:44px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--gold)}
-  .author-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text)}
-  .author-role{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.05em;margin-top:2px}
-  .back-btn{font-family:'DM Mono',monospace;font-size:12px;padding:11px 22px;border:0.5px solid var(--border2);border-radius:var(--r);color:var(--text);text-decoration:none;letter-spacing:0.06em;transition:all 0.2s}
-  .back-btn:hover{border-color:var(--gold);background:rgba(240,180,41,0.06);color:var(--gold)}
-  .fade{opacity:0;transform:translateY(16px);transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1),transform 0.6s cubic-bezier(0.22,1,0.36,1)}
-  .fade.visible{opacity:1;transform:translateY(0)}
-  @media(max-width:640px){
-    .post-hero{padding:110px 5vw 48px}.post-title{font-size:clamp(24px,7vw,36px)}
-    article{padding:0 5vw 60px}.final-grid{grid-template-columns:1fr}
-    .post-meta-bar{flex-direction:column;align-items:flex-start}.meta-divider{display:none}
-    .post-footer{flex-direction:column;align-items:flex-start;padding:32px 5vw 48px}
-    .spec-table td:first-child{width:110px}
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubuntu 24.04 on ASUS ROG G14 with RTX 5060 — Hemanth Sai</title>
+  <meta name="description"
+    content="Complete battle-tested guide — bootable USB with balenaEtcher &amp; Rufus, Ubuntu 24.04.4 LTS on ASUS ROG G14 with RTX 5060 Blackwell, CUDA 13.0, PyTorch 2.10, asusctl from source, brightness fix, ROG Control Center.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05060f;
+      --bg2: #0b0c1e;
+      --bg3: #111328;
+      --bg4: #181a35;
+      --gold: #f0b429;
+      --gold2: #ffd060;
+      --blue: #38bdf8;
+      --green: #4ade80;
+      --text: #eceaf5;
+      --muted: #7a7d9a;
+      --border: rgba(240, 180, 41, 0.10);
+      --border2: rgba(240, 180, 41, 0.20);
+      --r: 12px
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      line-height: 1.8;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 2px
+    }
+
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--blue));
+      z-index: 1000;
+      transition: width 0.1s;
+      box-shadow: 0 0 8px var(--gold)
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      padding: 18px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5, 6, 15, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid var(--border)
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em
+    }
+
+    .nav-logo span {
+      color: var(--gold)
+    }
+
+    .nav-back {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s
+    }
+
+    .nav-back:hover {
+      color: var(--gold)
+    }
+
+    .post-hero {
+      padding: 140px 5vw 80px;
+      max-width: 860px;
+      margin: 0 auto
+    }
+
+    .post-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .post-eyebrow .dot {
+      width: 3px;
+      height: 3px;
+      background: var(--muted);
+      border-radius: 50%
+    }
+
+    .tag-pill {
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px
+    }
+
+    .tag-pill.gold {
+      background: rgba(240, 180, 41, 0.08);
+      border: 0.5px solid rgba(240, 180, 41, 0.2);
+      color: var(--gold)
+    }
+
+    .tag-pill.blue {
+      background: rgba(56, 189, 248, 0.08);
+      border: 0.5px solid rgba(56, 189, 248, 0.2);
+      color: var(--blue)
+    }
+
+    .tag-pill.green {
+      background: rgba(74, 222, 128, 0.08);
+      border: 0.5px solid rgba(74, 222, 128, 0.2);
+      color: var(--green)
+    }
+
+    .post-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 24px
+    }
+
+    .post-title em {
+      color: var(--gold);
+      font-style: normal
+    }
+
+    .post-subtitle {
+      font-size: 18px;
+      color: rgba(236, 234, 245, 0.6);
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 660px;
+      margin-bottom: 40px
+    }
+
+    .post-meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 18px 0;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 64px
+    }
+
+    .meta-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase
+    }
+
+    .meta-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border2)
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 36px;
+      font-size: 14px;
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden
+    }
+
+    .spec-table td {
+      padding: 11px 16px;
+      border-bottom: 0.5px solid var(--border)
+    }
+
+    .spec-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .spec-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: 160px
+    }
+
+    .spec-table td:last-child {
+      color: var(--text);
+      font-weight: 500
+    }
+
+    article {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 5vw 100px
+    }
+
+    .phase {
+      margin: 64px 0 24px
+    }
+
+    .phase-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .phase-label::before {
+      content: '';
+      width: 16px;
+      height: 1px;
+      background: var(--gold)
+    }
+
+    h2.phase-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.2
+    }
+
+    h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+      margin: 40px 0 14px;
+      letter-spacing: -0.01em
+    }
+
+    p {
+      color: rgba(236, 234, 245, 0.78);
+      font-size: 17px;
+      line-height: 1.82;
+      font-weight: 300;
+      margin-bottom: 20px
+    }
+
+    p strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .callout {
+      border-left: 2px solid var(--gold);
+      background: rgba(240, 180, 41, 0.05);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 16px 20px;
+      margin: 28px 0
+    }
+
+    .callout.info {
+      border-color: var(--blue);
+      background: rgba(56, 189, 248, 0.05)
+    }
+
+    .callout.warn {
+      border-color: #f87171;
+      background: rgba(248, 113, 113, 0.05)
+    }
+
+    .callout.success {
+      border-color: var(--green);
+      background: rgba(74, 222, 128, 0.05)
+    }
+
+    .callout-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--gold)
+    }
+
+    .callout.info .callout-label {
+      color: var(--blue)
+    }
+
+    .callout.warn .callout-label {
+      color: #f87171
+    }
+
+    .callout.success .callout-label {
+      color: var(--green)
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(236, 234, 245, 0.7)
+    }
+
+    .code-block {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r);
+      margin: 24px 0;
+      overflow: hidden
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg3)
+    }
+
+    .code-lang {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .code-lang .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%
+    }
+
+    .dot-bash {
+      background: #4ade80
+    }
+
+    .dot-py {
+      background: #60a5fa
+    }
+
+    .dot-ini {
+      background: var(--gold)
+    }
+
+    .copy-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 0.5px solid var(--border2);
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: color 0.2s
+    }
+
+    .copy-btn:hover {
+      color: var(--gold)
+    }
+
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      margin: 0
+    }
+
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text)
+    }
+
+    p code,
+    li code {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 2px 7px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      border-radius: 4px;
+      color: var(--gold)
+    }
+
+    .cm {
+      color: var(--muted)
+    }
+
+    .ck {
+      color: #c084fc
+    }
+
+    .fl {
+      color: var(--blue)
+    }
+
+    .st {
+      color: #86efac
+    }
+
+    .ot {
+      color: var(--gold)
+    }
+
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0 28px
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: rgba(236, 234, 245, 0.75);
+      line-height: 1.6
+    }
+
+    .checklist li::before {
+      content: '✓';
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 2px
+    }
+
+    .checklist li strong {
+      color: var(--text)
+    }
+
+    .part-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0 32px;
+      font-size: 13px
+    }
+
+    .part-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 0.5px solid var(--border2)
+    }
+
+    .part-table td {
+      padding: 10px 12px;
+      border-bottom: 0.5px solid var(--border);
+      color: rgba(236, 234, 245, 0.75);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    .part-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .part-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--blue)
+    }
+
+    .bk {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(74, 222, 128, 0.1);
+      border: 0.5px solid rgba(74, 222, 128, 0.3);
+      color: var(--green)
+    }
+
+    .bf {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(248, 113, 113, 0.1);
+      border: 0.5px solid rgba(248, 113, 113, 0.3);
+      color: #f87171
+    }
+
+    .final-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0
+    }
+
+    .fi {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px
+    }
+
+    .fi::before {
+      content: '✓';
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .fi-t {
+      font-size: 13px;
+      color: rgba(236, 234, 245, 0.75);
+      line-height: 1.5
+    }
+
+    .fi-t strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px
+    }
+
+    .conclusion {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      margin-top: 64px
+    }
+
+    .conclusion-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 14px
+    }
+
+    .conclusion-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 12px
+    }
+
+    .conclusion p {
+      font-size: 16px;
+      margin-bottom: 0;
+      line-height: 1.7
+    }
+
+    .post-footer {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 5vw 80px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap
+    }
+
+    .author-card {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--gold)
+    }
+
+    .author-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text)
+    }
+
+    .author-role {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: 2px
+    }
+
+    .back-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 11px 22px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: all 0.2s
+    }
+
+    .back-btn:hover {
+      border-color: var(--gold);
+      background: rgba(240, 180, 41, 0.06);
+      color: var(--gold)
+    }
+
+    .fade {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)
+    }
+
+    .fade.visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    @media(max-width:640px) {
+      .post-hero {
+        padding: 110px 5vw 48px
+      }
+
+      .post-title {
+        font-size: clamp(24px, 7vw, 36px)
+      }
+
+      article {
+        padding: 0 5vw 60px
+      }
+
+      .final-grid {
+        grid-template-columns: 1fr
+      }
+
+      .post-meta-bar {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .meta-divider {
+        display: none
+      }
+
+      .post-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 32px 5vw 48px
+      }
+
+      .spec-table td:first-child {
+        width: 110px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div id="progress"></div>
-<nav>
-  <a href="../index.html" class="nav-logo">HM<span>.</span></a>
-  <a href="../index.html#blog" class="nav-back">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    All Posts
-  </a>
-</nav>
+  <div id="progress"></div>
+  <nav>
+    <a href="../index.html" class="nav-logo">HM<span>.</span></a>
+    <a href="../index.html#blog" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+      All Posts
+    </a>
+  </nav>
 
-<div class="post-hero fade">
-  <div class="post-eyebrow">
-    <span class="tag-pill gold">Linux</span>
-    <span class="tag-pill gold">MLOps</span>
-    <span class="tag-pill blue">Hardware</span>
-    <span class="tag-pill green">Battle-tested</span>
-    <span class="dot"></span><span>March 2026</span>
-    <span class="dot"></span><span>~25 min read</span>
+  <div class="post-hero fade">
+    <div class="post-eyebrow">
+      <span class="tag-pill gold">Linux</span>
+      <span class="tag-pill gold">MLOps</span>
+      <span class="tag-pill blue">Hardware</span>
+      <span class="tag-pill green">Battle-tested</span>
+      <span class="dot"></span><span>March 2026</span>
+      <span class="dot"></span><span>~25 min read</span>
+    </div>
+    <h1 class="post-title">Ubuntu 24.04 on the ASUS ROG G14<br><em>(RTX 5060 Blackwell)</em></h1>
+    <p class="post-subtitle">A complete, battle-tested walkthrough — from fresh install to a fully functional ML
+      workstation with CUDA 13.0, PyTorch 2.10, asusctl from source, and display brightness fixed.</p>
+    <div class="post-meta-bar">
+      <div class="meta-item">March 2026 · Hemanth Sai</div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">ASUS ROG Zephyrus G14 (GA403UM)</div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">Driver 580 · CUDA 13.0 · PyTorch 2.10</div>
+    </div>
   </div>
-  <h1 class="post-title">Ubuntu 24.04 on the ASUS ROG G14<br><em>(RTX 5060 Blackwell)</em></h1>
-  <p class="post-subtitle">A complete, battle-tested walkthrough — from fresh install to a fully functional ML workstation with CUDA 13.0, PyTorch 2.10, asusctl from source, and display brightness fixed.</p>
-  <div class="post-meta-bar">
-    <div class="meta-item">March 2026 · Hemanth Sai</div>
-    <div class="meta-divider"></div>
-    <div class="meta-item">ASUS ROG Zephyrus G14 (GA403UM)</div>
-    <div class="meta-divider"></div>
-    <div class="meta-item">Driver 580 · CUDA 13.0 · PyTorch 2.10</div>
-  </div>
-</div>
 
-<article>
+  <article>
 
-<table class="spec-table fade">
-  <tr><td>Laptop</td><td>ASUS ROG Zephyrus G14 (GA403UM)</td></tr>
-  <tr><td>GPU</td><td>NVIDIA GeForce RTX 5060 — Blackwell, 8GB GDDR7</td></tr>
-  <tr><td>OS</td><td>Ubuntu 24.04.4 LTS (Noble Numbat)</td></tr>
-  <tr><td>NVIDIA Driver</td><td>580.126.09 (open kernel module)</td></tr>
-  <tr><td>CUDA</td><td>13.0 (PyTorch built with cu128)</td></tr>
-  <tr><td>PyTorch</td><td>2.10.0+cu128</td></tr>
-</table>
+    <table class="spec-table fade">
+      <tr>
+        <td>Laptop</td>
+        <td>ASUS ROG Zephyrus G14 (GA403UM)</td>
+      </tr>
+      <tr>
+        <td>GPU</td>
+        <td>NVIDIA GeForce RTX 5060 — Blackwell, 8GB GDDR7</td>
+      </tr>
+      <tr>
+        <td>OS</td>
+        <td>Ubuntu 24.04.4 LTS (Noble Numbat)</td>
+      </tr>
+      <tr>
+        <td>NVIDIA Driver</td>
+        <td>580.126.09 (open kernel module)</td>
+      </tr>
+      <tr>
+        <td>CUDA</td>
+        <td>13.0 (PyTorch built with cu128)</td>
+      </tr>
+      <tr>
+        <td>PyTorch</td>
+        <td>2.10.0+cu128</td>
+      </tr>
+    </table>
 
-<!-- PHASE 0 -->
-<div class="phase fade"><div class="phase-label">Phase 00</div><h2 class="phase-title">Creating a Bootable USB</h2></div>
+    <!-- PHASE 0 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 00</div>
+      <h2 class="phase-title">Creating a Bootable USB</h2>
+    </div>
 
-<p class="fade">Before anything else, you need a bootable Ubuntu USB. You'll need at least an <strong>8GB USB drive</strong> — everything on it will be erased, so back it up first.</p>
+    <p class="fade">Before anything else, you need a bootable Ubuntu USB. You'll need at least an <strong>8GB USB
+        drive</strong> — everything on it will be erased, so back it up first.</p>
 
-<h3 class="fade">Step 1 — Download the ISO</h3>
+    <h3 class="fade">Step 1 — Download the ISO</h3>
 
-<div class="callout info fade">
-  <div class="callout-label">Exact version used in this guide</div>
-  <p>Download <strong>Ubuntu 24.04.4 LTS (Noble Numbat)</strong> — the .4 point release is important, it ships with a newer kernel that has better Blackwell support out of the box.</p>
-</div>
+    <div class="callout info fade">
+      <div class="callout-label">Exact version used in this guide</div>
+      <p>Download <strong>Ubuntu 24.04.4 LTS (Noble Numbat)</strong> — the .4 point release is important, it ships with
+        a newer kernel that has better Blackwell support out of the box.</p>
+    </div>
 
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-ini"></div>Download link</div></div>
-  <pre><code>https://ubuntu.com/download/desktop
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-ini"></div>Download link
+        </div>
+      </div>
+      <pre><code>https://ubuntu.com/download/desktop
 <span class="cm"># Click "Download 24.04.4 LTS"</span>
 <span class="cm"># File: ubuntu-24.04.4-desktop-amd64.iso (~5.7 GB)</span>
 <span class="cm"># Verify checksum after download (optional but recommended)</span>
 sha256sum ubuntu-24.04.4-desktop-amd64.iso</code></pre>
-</div>
+    </div>
 
-<p class="fade">Let it finish downloading completely before flashing — a partial ISO will silently produce a broken USB that fails mid-install.</p>
+    <p class="fade">Let it finish downloading completely before flashing — a partial ISO will silently produce a broken
+      USB that fails mid-install.</p>
 
-<h3 class="fade">Step 2a — Flash with balenaEtcher (macOS)</h3>
+    <h3 class="fade">Step 2a — Flash with balenaEtcher (macOS)</h3>
 
-<p class="fade">balenaEtcher is the easiest option on Mac — it handles permissions automatically and validates the write afterwards.</p>
+    <p class="fade">balenaEtcher is the easiest option on Mac — it handles permissions automatically and validates the
+      write afterwards.</p>
 
-<div class="callout info fade">
-  <div class="callout-label">Download balenaEtcher</div>
-  <p>Get it from <strong>etcher.balena.io</strong> — download the macOS .dmg, open it, drag Etcher to Applications. No brew, no CLI needed.</p>
-</div>
+    <div class="callout info fade">
+      <div class="callout-label">Download balenaEtcher</div>
+      <p>Get it from <strong>etcher.balena.io</strong> — download the macOS .dmg, open it, drag Etcher to Applications.
+        No brew, no CLI needed.</p>
+    </div>
 
-<ul class="checklist fade">
-  <li>Plug in your USB drive (8GB minimum, USB 3.0 recommended for speed)</li>
-  <li>Open <strong>balenaEtcher</strong></li>
-  <li>Click <strong>"Flash from file"</strong> → select your <code>ubuntu-24.04.4-desktop-amd64.iso</code></li>
-  <li>Click <strong>"Select target"</strong> → select your USB drive. <strong>Double-check the drive name</strong> — everything on it gets wiped</li>
-  <li>Click <strong>"Flash!"</strong> — macOS will prompt for your password to allow disk access</li>
-  <li>Wait for the flash <em>and</em> the validation step to complete (both bars hit 100%)</li>
-  <li>Etcher will auto-eject the drive when done — it's ready</li>
-</ul>
+    <ul class="checklist fade">
+      <li>Plug in your USB drive (8GB minimum, USB 3.0 recommended for speed)</li>
+      <li>Open <strong>balenaEtcher</strong></li>
+      <li>Click <strong>"Flash from file"</strong> → select your <code>ubuntu-24.04.4-desktop-amd64.iso</code></li>
+      <li>Click <strong>"Select target"</strong> → select your USB drive. <strong>Double-check the drive name</strong> —
+        everything on it gets wiped</li>
+      <li>Click <strong>"Flash!"</strong> — macOS will prompt for your password to allow disk access</li>
+      <li>Wait for the flash <em>and</em> the validation step to complete (both bars hit 100%)</li>
+      <li>Etcher will auto-eject the drive when done — it's ready</li>
+    </ul>
 
-<div class="callout warn fade">
-  <div class="callout-label">macOS may show a disk error popup</div>
-  <p>After flashing, macOS might pop up <em>"The disk you inserted was not readable by this computer"</em>. This is normal — the drive is now formatted as Linux. Click <strong>Ignore</strong>, not Eject or Initialize.</p>
-</div>
+    <div class="callout warn fade">
+      <div class="callout-label">macOS may show a disk error popup</div>
+      <p>After flashing, macOS might pop up <em>"The disk you inserted was not readable by this computer"</em>. This is
+        normal — the drive is now formatted as Linux. Click <strong>Ignore</strong>, not Eject or Initialize.</p>
+    </div>
 
-<h3 class="fade">Step 2b — Flash with Rufus (Windows)</h3>
+    <h3 class="fade">Step 2b — Flash with Rufus (Windows)</h3>
 
-<p class="fade">Rufus is the standard tool on Windows — faster than most alternatives and gives you full control over partition scheme and target system.</p>
+    <p class="fade">Rufus is the standard tool on Windows — faster than most alternatives and gives you full control
+      over partition scheme and target system.</p>
 
-<div class="callout info fade">
-  <div class="callout-label">Download Rufus</div>
-  <p>Get it from <strong>rufus.ie</strong> — the portable (.exe) version requires no install, just run it directly.</p>
-</div>
+    <div class="callout info fade">
+      <div class="callout-label">Download Rufus</div>
+      <p>Get it from <strong>rufus.ie</strong> — the portable (.exe) version requires no install, just run it directly.
+      </p>
+    </div>
 
-<ul class="checklist fade">
-  <li>Plug in your USB drive (8GB minimum)</li>
-  <li>Run <strong>Rufus</strong> as Administrator — right-click → Run as administrator</li>
-  <li><strong>Device</strong> — select your USB drive from the dropdown. Confirm the size matches</li>
-  <li><strong>Boot selection</strong> — click "SELECT" and choose your <code>ubuntu-24.04.4-desktop-amd64.iso</code>. Rufus will auto-detect most settings</li>
-  <li><strong>Partition scheme</strong> — set to <strong>GPT</strong> (for UEFI systems like the G14)</li>
-  <li><strong>Target system</strong> — set to <strong>UEFI (non CSM)</strong></li>
-  <li><strong>File system</strong> — leave as <strong>FAT32</strong> (auto-set by Rufus)</li>
-  <li>Click <strong>START</strong></li>
-</ul>
+    <ul class="checklist fade">
+      <li>Plug in your USB drive (8GB minimum)</li>
+      <li>Run <strong>Rufus</strong> as Administrator — right-click → Run as administrator</li>
+      <li><strong>Device</strong> — select your USB drive from the dropdown. Confirm the size matches</li>
+      <li><strong>Boot selection</strong> — click "SELECT" and choose your
+        <code>ubuntu-24.04.4-desktop-amd64.iso</code>. Rufus will auto-detect most settings</li>
+      <li><strong>Partition scheme</strong> — set to <strong>GPT</strong> (for UEFI systems like the G14)</li>
+      <li><strong>Target system</strong> — set to <strong>UEFI (non CSM)</strong></li>
+      <li><strong>File system</strong> — leave as <strong>FAT32</strong> (auto-set by Rufus)</li>
+      <li>Click <strong>START</strong></li>
+    </ul>
 
-<div class="callout warn fade">
-  <div class="callout-label">Write mode dialog</div>
-  <p>Rufus will ask: <em>"Write in ISO Image mode or DD Image mode?"</em> — choose <strong>Write in ISO Image mode (Recommended)</strong>. Then confirm that all data on the USB will be destroyed.</p>
-</div>
+    <div class="callout warn fade">
+      <div class="callout-label">Write mode dialog</div>
+      <p>Rufus will ask: <em>"Write in ISO Image mode or DD Image mode?"</em> — choose <strong>Write in ISO Image mode
+          (Recommended)</strong>. Then confirm that all data on the USB will be destroyed.</p>
+    </div>
 
-<ul class="checklist fade">
-  <li>Wait for the progress bar to reach 100% and the status to show <strong>"READY"</strong></li>
-  <li>Click CLOSE and safely eject the drive</li>
-</ul>
+    <ul class="checklist fade">
+      <li>Wait for the progress bar to reach 100% and the status to show <strong>"READY"</strong></li>
+      <li>Click CLOSE and safely eject the drive</li>
+    </ul>
 
-<h3 class="fade">Step 3 — Verify the USB works</h3>
+    <h3 class="fade">Step 3 — Verify the USB works</h3>
 
-<p class="fade">Before you start partitioning your actual machine, test that the USB boots correctly.</p>
+    <p class="fade">Before you start partitioning your actual machine, test that the USB boots correctly.</p>
 
-<ul class="checklist fade">
-  <li>Plug the USB into the G14 and power on</li>
-  <li>Spam <strong>ESC or F8</strong> immediately to get the boot override menu</li>
-  <li>Select the USB drive — you should see the purple Ubuntu/GRUB screen within a few seconds</li>
-  <li>Select <strong>"Try or Install Ubuntu"</strong> to confirm it loads (you don't have to install yet)</li>
-  <li>If the screen freezes at the splash: press <strong>E</strong> at the GRUB menu and add <code>nomodeset</code> after <code>quiet splash</code>, then press F10 to boot</li>
-</ul>
+    <ul class="checklist fade">
+      <li>Plug the USB into the G14 and power on</li>
+      <li>Spam <strong>ESC or F8</strong> immediately to get the boot override menu</li>
+      <li>Select the USB drive — you should see the purple Ubuntu/GRUB screen within a few seconds</li>
+      <li>Select <strong>"Try or Install Ubuntu"</strong> to confirm it loads (you don't have to install yet)</li>
+      <li>If the screen freezes at the splash: press <strong>E</strong> at the GRUB menu and add <code>nomodeset</code>
+        after <code>quiet splash</code>, then press F10 to boot</li>
+    </ul>
 
-<div class="callout success fade">
-  <div class="callout-label">USB is ready</div>
-  <p>If you see the Ubuntu desktop or installer, your USB is good. You can now proceed to the pre-installation checklist below.</p>
-</div>
+    <div class="callout success fade">
+      <div class="callout-label">USB is ready</div>
+      <p>If you see the Ubuntu desktop or installer, your USB is good. You can now proceed to the pre-installation
+        checklist below.</p>
+    </div>
 
-<!-- PHASE 1 -->
-<div class="phase fade"><div class="phase-label">Phase 01</div><h2 class="phase-title">Pre-Installation Checklist</h2></div>
-<p class="fade">Run through these on Windows before rebooting into the USB installer.</p>
-<ul class="checklist fade">
-  <li>Verify Windows boots normally and is stable</li>
-  <li><strong>Disable BitLocker</strong> — Settings → Privacy &amp; Security → Device Encryption → Off. The G14 ships with BitLocker enabled by default</li>
-  <li>Back up SSH keys (<code>~/.ssh</code>), git config (<code>~/.gitconfig</code>), project files</li>
-  <li>Export conda environments: <code>conda env export > environment.yml</code></li>
-  <li>Note your WiFi password</li>
-</ul>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — note partition layout</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="cm"># Shows all block devices with mount points and sizes</span>
+    <!-- PHASE 1 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 01</div>
+      <h2 class="phase-title">Pre-Installation Checklist</h2>
+    </div>
+    <p class="fade">Run through these on Windows before rebooting into the USB installer.</p>
+    <ul class="checklist fade">
+      <li>Verify Windows boots normally and is stable</li>
+      <li><strong>Disable BitLocker</strong> — Settings → Privacy &amp; Security → Device Encryption → Off. The G14
+        ships with BitLocker enabled by default</li>
+      <li>Back up SSH keys (<code>~/.ssh</code>), git config (<code>~/.gitconfig</code>), project files</li>
+      <li>Export conda environments: <code>conda env export > environment.yml</code></li>
+      <li>Note your WiFi password</li>
+    </ul>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — note partition layout
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="cm"># Shows all block devices with mount points and sizes</span>
 lsblk</code></pre>
-</div>
-<p class="fade"><strong>Required BIOS settings:</strong> Secure Boot Disabled · Boot mode UEFI · Laptop plugged in · Bootable USB ready</p>
+    </div>
+    <p class="fade"><strong>Required BIOS settings:</strong> Secure Boot Disabled · Boot mode UEFI · Laptop plugged in ·
+      Bootable USB ready</p>
 
-<!-- PHASE 2 -->
-<div class="phase fade"><div class="phase-label">Phase 02</div><h2 class="phase-title">Booting from USB</h2></div>
-<div class="callout warn fade">
-  <div class="callout-label">G14-specific — not F12</div>
-  <p>The G14 uses <strong>ESC or F8</strong> for the boot device menu. F2 enters BIOS — if that happens: Save &amp; Exit → Boot Override → select USB.</p>
-</div>
-<ul class="checklist fade">
-  <li>Plug in power cable and bootable USB</li>
-  <li>Press power button, immediately spam <strong>ESC or F8</strong> as the ASUS logo appears</li>
-  <li>Select your USB drive from the boot override menu</li>
-</ul>
-<div class="callout info fade">
-  <div class="callout-label">If the installer freezes</div>
-  <p>Press <code>E</code> at the grub menu and add <code>nomodeset</code> to the kernel line to bypass the NVIDIA init hang.</p>
-</div>
+    <!-- PHASE 2 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 02</div>
+      <h2 class="phase-title">Booting from USB</h2>
+    </div>
+    <div class="callout warn fade">
+      <div class="callout-label">G14-specific — not F12</div>
+      <p>The G14 uses <strong>ESC or F8</strong> for the boot device menu. F2 enters BIOS — if that happens: Save &amp;
+        Exit → Boot Override → select USB.</p>
+    </div>
+    <ul class="checklist fade">
+      <li>Plug in power cable and bootable USB</li>
+      <li>Press power button, immediately spam <strong>ESC or F8</strong> as the ASUS logo appears</li>
+      <li>Select your USB drive from the boot override menu</li>
+    </ul>
+    <div class="callout info fade">
+      <div class="callout-label">If the installer freezes</div>
+      <p>Press <code>E</code> at the grub menu and add <code>nomodeset</code> to the kernel line to bypass the NVIDIA
+        init hang.</p>
+    </div>
 
-<!-- PHASE 3 -->
-<div class="phase fade"><div class="phase-label">Phase 03</div><h2 class="phase-title">Partitioning Strategy</h2></div>
-<p class="fade">Use <strong>"Something else"</strong> (manual partitioning). Only reformat the Ubuntu root partition — leave everything else untouched.</p>
-<div class="callout warn fade">
-  <div class="callout-label">Critical</div>
-  <p>Never touch Windows NTFS partitions or the EFI partition. Only reformat <code>nvme0n1p10</code> (Ubuntu root).</p>
-</div>
-<table class="part-table fade">
-  <thead><tr><th>Partition</th><th>Size</th><th>Type / Mount</th><th>Action</th></tr></thead>
-  <tbody>
-    <tr><td>nvme0n1p1</td><td>260 MB</td><td>vfat / /boot/efi</td><td><span class="bk">KEEP — shared EFI</span></td></tr>
-    <tr><td>nvme0n1p3</td><td>192 GB</td><td>NTFS (Windows)</td><td><span class="bk">KEEP — do not touch</span></td></tr>
-    <tr><td>nvme0n1p8</td><td>22.4 GB</td><td>swap area</td><td><span class="bk">KEEP as swap</span></td></tr>
-    <tr><td>nvme0n1p9</td><td>558.8 GB</td><td>ext4 / /home</td><td><span class="bk">KEEP — DO NOT FORMAT</span></td></tr>
-    <tr><td>nvme0n1p10</td><td>150.8 GB</td><td>ext4 / /</td><td><span class="bf">FORMAT — Ubuntu root only</span></td></tr>
-  </tbody>
-</table>
-<div class="callout success fade">
-  <div class="callout-label">The /home advantage</div>
-  <p>The separate <code>/home</code> partition means all files, conda envs, SSH keys, and projects survive the reinstall completely intact — no backup needed.</p>
-</div>
+    <!-- PHASE 3 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 03</div>
+      <h2 class="phase-title">Partitioning Strategy</h2>
+    </div>
+    <p class="fade">Use <strong>"Something else"</strong> (manual partitioning). Only reformat the Ubuntu root partition
+      — leave everything else untouched.</p>
+    <div class="callout warn fade">
+      <div class="callout-label">Critical</div>
+      <p>Never touch Windows NTFS partitions or the EFI partition. Only reformat <code>nvme0n1p10</code> (Ubuntu root).
+      </p>
+    </div>
+    <table class="part-table fade">
+      <thead>
+        <tr>
+          <th>Partition</th>
+          <th>Size</th>
+          <th>Type / Mount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>nvme0n1p1</td>
+          <td>260 MB</td>
+          <td>vfat / /boot/efi</td>
+          <td><span class="bk">KEEP — shared EFI</span></td>
+        </tr>
+        <tr>
+          <td>nvme0n1p3</td>
+          <td>192 GB</td>
+          <td>NTFS (Windows)</td>
+          <td><span class="bk">KEEP — do not touch</span></td>
+        </tr>
+        <tr>
+          <td>nvme0n1p8</td>
+          <td>22.4 GB</td>
+          <td>swap area</td>
+          <td><span class="bk">KEEP as swap</span></td>
+        </tr>
+        <tr>
+          <td>nvme0n1p9</td>
+          <td>558.8 GB</td>
+          <td>ext4 / /home</td>
+          <td><span class="bk">KEEP — DO NOT FORMAT</span></td>
+        </tr>
+        <tr>
+          <td>nvme0n1p10</td>
+          <td>150.8 GB</td>
+          <td>ext4 / /</td>
+          <td><span class="bf">FORMAT — Ubuntu root only</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout success fade">
+      <div class="callout-label">The /home advantage</div>
+      <p>The separate <code>/home</code> partition means all files, conda envs, SSH keys, and projects survive the
+        reinstall completely intact — no backup needed.</p>
+    </div>
 
-<!-- PHASE 4 -->
-<div class="phase fade"><div class="phase-label">Phase 04</div><h2 class="phase-title">Post-Install Verification</h2></div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">ping</span> <span class="fl">-c</span> 3 google.com   <span class="cm"># verify internet</span>
+    <!-- PHASE 4 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 04</div>
+      <h2 class="phase-title">Post-Install Verification</h2>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">ping</span> <span class="fl">-c</span> 3 google.com   <span class="cm"># verify internet</span>
 lsblk                  <span class="cm"># check partition mounts</span>
 lsb_release <span class="fl">-a</span>         <span class="cm"># confirm Ubuntu version</span></code></pre>
-</div>
+    </div>
 
-<!-- PHASE 5 -->
-<div class="phase fade"><div class="phase-label">Phase 05</div><h2 class="phase-title">NVIDIA Driver Installation</h2></div>
-<p class="fade">The RTX 5060 is Blackwell architecture and requires <strong>driver 570 or higher</strong>. Older drivers will not detect the GPU at all.</p>
-<div class="callout warn fade">
-  <div class="callout-label">Do not apt upgrade yet</div>
-  <p>Do <strong>NOT</strong> run <code>sudo apt upgrade</code> before confirming NVIDIA drivers are correctly installed. A prior automatic update caused the original system failure on this machine.</p>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="cm"># Step 1 — update package list only (no upgrade yet)</span>
+    <!-- PHASE 5 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 05</div>
+      <h2 class="phase-title">NVIDIA Driver Installation</h2>
+    </div>
+    <p class="fade">The RTX 5060 is Blackwell architecture and requires <strong>driver 570 or higher</strong>. Older
+      drivers will not detect the GPU at all.</p>
+    <div class="callout warn fade">
+      <div class="callout-label">Do not apt upgrade yet</div>
+      <p>Do <strong>NOT</strong> run <code>sudo apt upgrade</code> before confirming NVIDIA drivers are correctly
+        installed. A prior automatic update caused the original system failure on this machine.</p>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="cm"># Step 1 — update package list only (no upgrade yet)</span>
 <span class="ck">sudo</span> apt update
 
 <span class="cm"># Step 2 — check recommended driver</span>
@@ -324,31 +1075,50 @@ ubuntu-drivers devices
 
 <span class="cm"># Step 4 — reboot and verify</span>
 <span class="ck">sudo</span> reboot</code></pre>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — after reboot</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>nvidia-smi
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — after reboot
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>nvidia-smi
 <span class="ot"># NVIDIA GeForce RTX 5060 | Driver 580.126.09 | CUDA 13.0</span></code></pre>
-</div>
+    </div>
 
-<!-- PHASE 6 -->
-<div class="phase fade"><div class="phase-label">Phase 06</div><h2 class="phase-title">System Update</h2></div>
-<p class="fade">With NVIDIA drivers confirmed working, it is now safe to run the full system update.</p>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">sudo</span> apt upgrade
+    <!-- PHASE 6 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 06</div>
+      <h2 class="phase-title">System Update</h2>
+    </div>
+    <p class="fade">With NVIDIA drivers confirmed working, it is now safe to run the full system update.</p>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">sudo</span> apt upgrade
 <span class="cm"># Review the list — stop if nvidia-driver or linux-image appears unexpectedly</span>
 <span class="ck">sudo</span> reboot
 nvidia-smi   <span class="cm"># verify GPU still works after upgrade</span></code></pre>
-</div>
+    </div>
 
-<!-- PHASE 7 -->
-<div class="phase fade"><div class="phase-label">Phase 07</div><h2 class="phase-title">asusctl &amp; supergfxctl from Source</h2></div>
-<p class="fade">The asus-linux PPA is no longer available for Ubuntu 24.04. Both tools must be built from source. They provide ROG-specific controls: fan curves, RGB, battery limits, performance profiles, and GPU switching.</p>
-<h3 class="fade">Install Rust and Build Dependencies</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="cm"># Install Rust (asusctl is written in Rust)</span>
+    <!-- PHASE 7 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 07</div>
+      <h2 class="phase-title">asusctl &amp; supergfxctl from Source</h2>
+    </div>
+    <p class="fade">The asus-linux PPA is no longer available for Ubuntu 24.04. Both tools must be built from source.
+      They provide ROG-specific controls: fan curves, RGB, battery limits, performance profiles, and GPU switching.</p>
+    <h3 class="fade">Install Rust and Build Dependencies</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="cm"># Install Rust (asusctl is written in Rust)</span>
 <span class="ck">curl</span> <span class="fl">--proto</span> <span class="st">'=https'</span> <span class="fl">--tlsv1.2</span> -sSf https://sh.rustup.rs | sh
 <span class="cm"># Choose option 1 (default)</span>
 <span class="ck">source</span> $HOME/.cargo/env
@@ -360,20 +1130,28 @@ nvidia-smi   <span class="cm"># verify GPU still works after upgrade</span></cod
 
 rustc <span class="fl">--version</span>   <span class="cm"># should show 1.94.0 or newer</span>
 cargo <span class="fl">--version</span></code></pre>
-</div>
-<h3 class="fade">Build &amp; Install supergfxctl</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">cd</span> ~/Downloads
+    </div>
+    <h3 class="fade">Build &amp; Install supergfxctl</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">cd</span> ~/Downloads
 <span class="ck">git</span> clone https://gitlab.com/asus-linux/supergfxctl.git
 <span class="ck">cd</span> supergfxctl && make <span class="fl">-j$(nproc)</span> && <span class="ck">sudo</span> make install
 <span class="ck">sudo</span> systemctl enable supergfxd <span class="fl">--now</span>
 supergfxctl <span class="fl">--get</span>   <span class="ot"># Hybrid</span></code></pre>
-</div>
-<h3 class="fade">Build &amp; Install asusctl</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">cd</span> ~/Downloads
+    </div>
+    <h3 class="fade">Build &amp; Install asusctl</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">cd</span> ~/Downloads
 <span class="ck">git</span> clone https://gitlab.com/asus-linux/asusctl.git
 <span class="ck">cd</span> asusctl && make <span class="fl">-j$(nproc)</span> && <span class="ck">sudo</span> make install
 <span class="ck">sudo</span> systemctl start asusd
@@ -383,94 +1161,148 @@ asusctl info                  <span class="cm"># confirm G14 GA403UM detected</s
 asusctl profile list          <span class="cm"># Quiet / Balanced / Performance</span>
 asusctl battery limit 80      <span class="cm"># 80% charge limit for longevity</span>
 asusctl battery info          <span class="ot"># 80%</span></code></pre>
-</div>
-<div class="callout info fade">
-  <div class="callout-label">Recommended GPU mode for ML work</div>
-  <p><strong>Hybrid mode</strong> — AMD iGPU handles the display (saving power), RTX 5060 is available on-demand for CUDA. Best balance for a portable ML workstation.</p>
-</div>
+    </div>
+    <div class="callout info fade">
+      <div class="callout-label">Recommended GPU mode for ML work</div>
+      <p><strong>Hybrid mode</strong> — AMD iGPU handles the display (saving power), RTX 5060 is available on-demand for
+        CUDA. Best balance for a portable ML workstation.</p>
+    </div>
 
-<!-- PHASE 8 -->
-<div class="phase fade"><div class="phase-label">Phase 08</div><h2 class="phase-title">Boot Optimization</h2></div>
-<p class="fade">One service slows down boot significantly on fresh Ubuntu 24.04. Disabling it saves approximately <strong>3.6 seconds</strong>.</p>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>systemd-analyze blame | head <span class="fl">-10</span>   <span class="cm"># check bottlenecks</span>
+    <!-- PHASE 8 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 08</div>
+      <h2 class="phase-title">Boot Optimization</h2>
+    </div>
+    <p class="fade">One service slows down boot significantly on fresh Ubuntu 24.04. Disabling it saves approximately
+      <strong>3.6 seconds</strong>.</p>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>systemd-analyze blame | head <span class="fl">-10</span>   <span class="cm"># check bottlenecks</span>
 <span class="ck">sudo</span> systemctl disable NetworkManager-wait-online.service
 <span class="ck">sudo</span> reboot</code></pre>
-</div>
+    </div>
 
-<!-- PHASE 9 -->
-<div class="phase fade"><div class="phase-label">Phase 09</div><h2 class="phase-title">ML Stack — Miniconda &amp; PyTorch</h2></div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — install Miniconda</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">wget</span> https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    <!-- PHASE 9 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 09</div>
+      <h2 class="phase-title">ML Stack — Miniconda &amp; PyTorch</h2>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — install Miniconda
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">wget</span> https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 <span class="ck">bash</span> Miniconda3-latest-Linux-x86_64.sh   <span class="cm"># accept license, default path, yes to init</span>
 <span class="ck">source</span> ~/.bashrc
 conda <span class="fl">--version</span>   <span class="ot"># 26.x</span></code></pre>
-</div>
-<div class="callout warn fade">
-  <div class="callout-label">Miniconda 26.x channel issue</div>
-  <p>Miniconda 26.x enforces Anaconda ToS for default channels. Fix this before creating any environments.</p>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — fix channels, create env</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">conda</span> config <span class="fl">--add</span> channels conda-forge
+    </div>
+    <div class="callout warn fade">
+      <div class="callout-label">Miniconda 26.x channel issue</div>
+      <p>Miniconda 26.x enforces Anaconda ToS for default channels. Fix this before creating any environments.</p>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — fix channels, create env
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">conda</span> config <span class="fl">--add</span> channels conda-forge
 <span class="ck">conda</span> config <span class="fl">--set</span> channel_priority strict
 <span class="ck">conda</span> config <span class="fl">--remove</span> channels defaults
 
 <span class="ck">conda</span> create <span class="fl">-n</span> ml python=3.11 <span class="fl">-y</span> <span class="fl">--override-channels</span> <span class="fl">-c</span> conda-forge
 <span class="ck">conda</span> activate ml</code></pre>
-</div>
-<div class="callout info fade">
-  <div class="callout-label">cu128 vs CUDA 13.0 — why it works</div>
-  <p><code>cu128</code> = CUDA 12.8. Driver 580 supports up to CUDA 13.0. CUDA is backward compatible — driver 580 runs CUDA 12.8 binaries perfectly fine.</p>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — install PyTorch</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>pip install torch torchvision torchaudio \
+    </div>
+    <div class="callout info fade">
+      <div class="callout-label">cu128 vs CUDA 13.0 — why it works</div>
+      <p><code>cu128</code> = CUDA 12.8. Driver 580 supports up to CUDA 13.0. CUDA is backward compatible — driver 580
+        runs CUDA 12.8 binaries perfectly fine.</p>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — install PyTorch
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>pip install torch torchvision torchaudio \
   <span class="fl">--index-url</span> https://download.pytorch.org/whl/cu128</code></pre>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-py"></div>Python — verify end-to-end</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>import torch
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-py"></div>Python — verify end-to-end
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>import torch
 print(torch.__version__)               <span class="ot"># 2.10.0+cu128</span>
 print(torch.cuda.is_available())       <span class="ot"># True</span>
 print(torch.cuda.get_device_name(0))   <span class="ot"># NVIDIA GeForce RTX 5060 Laptop GPU</span></code></pre>
-</div>
+    </div>
 
-<!-- PHASE 10 -->
-<div class="phase fade"><div class="phase-label">Phase 10</div><h2 class="phase-title">Display Brightness Fix</h2></div>
-<p class="fade">The G14 with hybrid GPU exposes <strong>three backlight devices</strong>. GNOME defaults to <code>nvidia_wmi_ec_backlight</code> which does nothing. The working device is <code>amdgpu_bl2</code>. Four steps to fix it permanently.</p>
-<h3 class="fade">Step 1 — GRUB parameter</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-ini"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">sudo</span> nano /etc/default/grub
+    <!-- PHASE 10 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 10</div>
+      <h2 class="phase-title">Display Brightness Fix</h2>
+    </div>
+    <p class="fade">The G14 with hybrid GPU exposes <strong>three backlight devices</strong>. GNOME defaults to
+      <code>nvidia_wmi_ec_backlight</code> which does nothing. The working device is <code>amdgpu_bl2</code>. Four steps
+      to fix it permanently.</p>
+    <h3 class="fade">Step 1 — GRUB parameter</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-ini"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">sudo</span> nano /etc/default/grub
 <span class="cm"># Change to:</span>
 GRUB_CMDLINE_LINUX_DEFAULT=<span class="st">"quiet splash acpi_backlight=native"</span>
 
 <span class="ck">sudo</span> update-grub && <span class="ck">sudo</span> reboot</code></pre>
-</div>
-<h3 class="fade">Step 2 — Install brightnessctl &amp; grant permissions</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">sudo</span> apt install brightnessctl
+    </div>
+    <h3 class="fade">Step 2 — Install brightnessctl &amp; grant permissions</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">sudo</span> apt install brightnessctl
 <span class="ck">sudo</span> usermod <span class="fl">-aG</span> video $USER
 <span class="ck">sudo</span> chmod a+w /sys/class/backlight/amdgpu_bl2/brightness
 brightnessctl <span class="fl">-d</span> amdgpu_bl2 set 70%   <span class="cm"># test — screen should dim</span></code></pre>
-</div>
-<h3 class="fade">Step 3 — Persistent udev rule</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-ini"></div>/etc/udev/rules.d/99-backlight.rules</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>ACTION==<span class="st">"add"</span>, SUBSYSTEM==<span class="st">"backlight"</span>, KERNEL==<span class="st">"amdgpu_bl2"</span>, RUN+=<span class="st">"/bin/chmod a+w /sys/class/backlight/amdgpu_bl2/brightness"</span></code></pre>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">sudo</span> udevadm control <span class="fl">--reload-rules</span> && <span class="ck">sudo</span> udevadm trigger</code></pre>
-</div>
-<h3 class="fade">Step 4 — acpid for Fn brightness keys</h3>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="ck">sudo</span> apt install acpid && <span class="ck">sudo</span> systemctl enable acpid <span class="fl">--now</span>
+    </div>
+    <h3 class="fade">Step 3 — Persistent udev rule</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-ini"></div>/etc/udev/rules.d/99-backlight.rules
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>ACTION==<span class="st">"add"</span>, SUBSYSTEM==<span class="st">"backlight"</span>, KERNEL==<span class="st">"amdgpu_bl2"</span>, RUN+=<span class="st">"/bin/chmod a+w /sys/class/backlight/amdgpu_bl2/brightness"</span></code></pre>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">sudo</span> udevadm control <span class="fl">--reload-rules</span> && <span class="ck">sudo</span> udevadm trigger</code></pre>
+    </div>
+    <h3 class="fade">Step 4 — acpid for Fn brightness keys</h3>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="ck">sudo</span> apt install acpid && <span class="ck">sudo</span> systemctl enable acpid <span class="fl">--now</span>
 
 <span class="cm"># /etc/acpi/events/brightness</span>
 <span class="st">event=video/brightnessup</span>
@@ -491,25 +1323,39 @@ fi</span>
 <span class="ck">sudo</span> chmod +x /etc/acpi/brightness.sh
 <span class="ck">sudo</span> systemctl restart acpid
 <span class="cm"># Fn+F7 (down) and Fn+F8 (up) now work</span></code></pre>
-</div>
+    </div>
 
-<!-- PHASE 11 -->
-<div class="phase fade"><div class="phase-label">Phase 11</div><h2 class="phase-title">ROG Control Center GUI</h2></div>
-<p class="fade">The default <code>rog-control-center</code> build crashes on Ubuntu 24.04 because <code>$WAYLAND_DISPLAY</code> is empty (X11 session). It needs to be rebuilt with the X11 feature flag.</p>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — the crash</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code>rog-control-center
+    <!-- PHASE 11 -->
+    <div class="phase fade">
+      <div class="phase-label">Phase 11</div>
+      <h2 class="phase-title">ROG Control Center GUI</h2>
+    </div>
+    <p class="fade">The default <code>rog-control-center</code> build crashes on Ubuntu 24.04 because
+      <code>$WAYLAND_DISPLAY</code> is empty (X11 session). It needs to be rebuilt with the X11 feature flag.</p>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — the crash
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>rog-control-center
 <span class="ot"># Error: neither WAYLAND_DISPLAY nor WAYLAND_SOCKET is set</span>
 <span class="ot"># note: enable the winit/x11 feature to support X11</span>
 <span class="ot"># Aborted (core dumped)</span></code></pre>
-</div>
-<div class="callout warn fade">
-  <div class="callout-label">Exact flag matters</div>
-  <p>Use <code>--features "x11"</code> — NOT <code>--features "winit/x11"</code>. The second form fails with "package does not contain this feature". The <code>x11</code> flag maps to <code>slint/backend-winit-x11</code> internally.</p>
-</div>
-<div class="code-block fade">
-  <div class="code-header"><div class="code-lang"><div class="dot dot-bash"></div>Bash — fix and rebuild</div><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-  <pre><code><span class="cm"># Install X11 dev libraries</span>
+    </div>
+    <div class="callout warn fade">
+      <div class="callout-label">Exact flag matters</div>
+      <p>Use <code>--features "x11"</code> — NOT <code>--features "winit/x11"</code>. The second form fails with
+        "package does not contain this feature". The <code>x11</code> flag maps to <code>slint/backend-winit-x11</code>
+        internally.</p>
+    </div>
+    <div class="code-block fade">
+      <div class="code-header">
+        <div class="code-lang">
+          <div class="dot dot-bash"></div>Bash — fix and rebuild
+        </div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code><span class="cm"># Install X11 dev libraries</span>
 <span class="ck">sudo</span> apt install libx11-dev libxrandr-dev libxcursor-dev \
   libxi-dev libxinerama-dev
 
@@ -520,53 +1366,80 @@ cargo build <span class="fl">--release</span> <span class="fl">--features</span>
 
 <span class="cm"># Launch</span>
 DISPLAY=:1 rog-control-center</code></pre>
-</div>
-
-<!-- Final state -->
-<div class="phase fade"><div class="phase-label">Final State</div><h2 class="phase-title">Verified working system</h2></div>
-<div class="final-grid fade">
-  <div class="fi"><div class="fi-t"><strong>Ubuntu 24.04.4 LTS</strong>Clean dual-boot, /home preserved</div></div>
-  <div class="fi"><div class="fi-t"><strong>RTX 5060 — Driver 580.126.09</strong>CUDA 13.0 · nvidia-smi confirmed</div></div>
-  <div class="fi"><div class="fi-t"><strong>PyTorch 2.10.0+cu128</strong>CUDA available · GPU detected</div></div>
-  <div class="fi"><div class="fi-t"><strong>supergfxd running</strong>GPU mode: Hybrid</div></div>
-  <div class="fi"><div class="fi-t"><strong>asusd running</strong>Quiet / Balanced / Performance</div></div>
-  <div class="fi"><div class="fi-t"><strong>Battery limit: 80%</strong>Longevity mode active</div></div>
-  <div class="fi"><div class="fi-t"><strong>Fn brightness keys working</strong>acpid + brightnessctl (amdgpu_bl2)</div></div>
-  <div class="fi"><div class="fi-t"><strong>Boot optimised</strong>NetworkManager-wait-online disabled</div></div>
-  <div class="fi"><div class="fi-t"><strong>Miniconda 26.1.1</strong>ml env · Python 3.11 · conda-forge</div></div>
-  <div class="fi"><div class="fi-t"><strong>ROG Control Center</strong>Rebuilt with x11 · full GUI working</div></div>
-</div>
-
-<div class="conclusion fade">
-  <div class="conclusion-label">Conclusion</div>
-  <div class="conclusion-title">A fully functional ML workstation in your backpack.</div>
-  <p>Getting the RTX 5060 Blackwell working on Ubuntu 24.04 requires knowing where the landmines are — the driver order of operations, the missing PPA, three backlight devices GNOME ignores, and a ROG Control Center build that crashes out of the box. This guide hits all of them. With Hybrid mode, an 80% charge limit, and PyTorch on CUDA 12.8, this G14 runs full training jobs at the library just as well as a dedicated workstation.</p>
-</div>
-
-</article>
-
-<div class="post-footer fade">
-  <div class="author-card">
-    <div class="author-avatar">HS</div>
-    <div>
-      <div class="author-name">Hemanth Sai .M</div>
-      <div class="author-role">MS AI · Northeastern University</div>
     </div>
-  </div>
-  <a href="../index.html#blog" class="back-btn">← Back to Blog</a>
-</div>
 
-<script>
-const bar = document.getElementById('progress');
-window.addEventListener('scroll', () => { bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%'; });
-const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.06 });
-document.querySelectorAll('.fade').forEach(el => obs.observe(el));
-function copyCode(btn) {
-  navigator.clipboard.writeText(btn.closest('.code-block').querySelector('pre').innerText).then(() => {
-    btn.textContent = 'Copied!'; btn.style.color = '#4ade80';
-    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1800);
-  });
-}
-</script>
+    <!-- Final state -->
+    <div class="phase fade">
+      <div class="phase-label">Final State</div>
+      <h2 class="phase-title">Verified working system</h2>
+    </div>
+    <div class="final-grid fade">
+      <div class="fi">
+        <div class="fi-t"><strong>Ubuntu 24.04.4 LTS</strong>Clean dual-boot, /home preserved</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>RTX 5060 — Driver 580.126.09</strong>CUDA 13.0 · nvidia-smi confirmed</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>PyTorch 2.10.0+cu128</strong>CUDA available · GPU detected</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>supergfxd running</strong>GPU mode: Hybrid</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>asusd running</strong>Quiet / Balanced / Performance</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>Battery limit: 80%</strong>Longevity mode active</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>Fn brightness keys working</strong>acpid + brightnessctl (amdgpu_bl2)</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>Boot optimised</strong>NetworkManager-wait-online disabled</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>Miniconda 26.1.1</strong>ml env · Python 3.11 · conda-forge</div>
+      </div>
+      <div class="fi">
+        <div class="fi-t"><strong>ROG Control Center</strong>Rebuilt with x11 · full GUI working</div>
+      </div>
+    </div>
+
+    <div class="conclusion fade">
+      <div class="conclusion-label">Conclusion</div>
+      <div class="conclusion-title">A fully functional ML workstation in your backpack.</div>
+      <p>Getting the RTX 5060 Blackwell working on Ubuntu 24.04 requires knowing where the landmines are — the driver
+        order of operations, the missing PPA, three backlight devices GNOME ignores, and a ROG Control Center build that
+        crashes out of the box. This guide hits all of them. With Hybrid mode, an 80% charge limit, and PyTorch on CUDA
+        12.8, this G14 runs full training jobs at the library just as well as a dedicated workstation.</p>
+    </div>
+
+  </article>
+
+  <div class="post-footer fade">
+    <div class="author-card">
+      <div class="author-avatar">HM</div>
+      <div>
+        <div class="author-name">Hemanth Sai .M</div>
+        <div class="author-role">MS AI · Northeastern University</div>
+      </div>
+    </div>
+    <a href="../index.html#blog" class="back-btn">← Back to Blog</a>
+  </div>
+
+  <script>
+    const bar = document.getElementById('progress');
+    window.addEventListener('scroll', () => { bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%'; });
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.06 });
+    document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+    function copyCode(btn) {
+      navigator.clipboard.writeText(btn.closest('.code-block').querySelector('pre').innerText).then(() => {
+        btn.textContent = 'Copied!'; btn.style.color = '#4ade80';
+        setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1800);
+      });
+    }
+  </script>
 </body>
+
 </html>
