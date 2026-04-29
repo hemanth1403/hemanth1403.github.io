@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLM Counterfactual Consistency — Hemanth Sai</title>
+  <meta name="description"
+    content="Research probing whether LLaVA-1.5 and InstructBLIP truly reason about visual content using counterfactual question families and a novel Consistency Score metric.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05060f;
+      --bg2: #0b0c1e;
+      --bg3: #111328;
+      --bg4: #181a35;
+      --gold: #f0b429;
+      --gold2: #ffd060;
+      --blue: #38bdf8;
+      --green: #4ade80;
+      --text: #eceaf5;
+      --muted: #7a7d9a;
+      --border: rgba(240, 180, 41, 0.10);
+      --border2: rgba(240, 180, 41, 0.20);
+      --r: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html { scroll-behavior: smooth }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-size: 17px; line-height: 1.8; overflow-x: hidden }
+    ::-webkit-scrollbar { width: 4px }
+    ::-webkit-scrollbar-track { background: var(--bg) }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px }
+
+    #progress { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--gold), var(--blue)); z-index: 1000; transition: width 0.1s; box-shadow: 0 0 8px var(--gold) }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 900; padding: 18px 5vw; display: flex; align-items: center; justify-content: space-between; background: rgba(5, 6, 15, 0.92); backdrop-filter: blur(12px); border-bottom: 0.5px solid var(--border) }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--text); text-decoration: none; letter-spacing: 0.02em }
+    .nav-logo span { color: var(--gold) }
+    .nav-back { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; transition: color 0.2s }
+    .nav-back:hover { color: var(--gold) }
+
+    .post-hero { padding: 140px 5vw 80px; max-width: 900px; margin: 0 auto }
+    .post-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap }
+    .post-eyebrow .dot { width: 3px; height: 3px; background: var(--muted); border-radius: 50% }
+    .tag-pill { padding: 3px 10px; border-radius: 4px; letter-spacing: 0.06em }
+    .tag-pill.gold { background: rgba(240, 180, 41, 0.08); border: 0.5px solid rgba(240, 180, 41, 0.2); color: var(--gold) }
+    .tag-pill.blue { background: rgba(56, 189, 248, 0.08); border: 0.5px solid rgba(56, 189, 248, 0.2); color: var(--blue) }
+
+    .post-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(28px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.02em; color: var(--text); margin-bottom: 24px }
+    .post-title em { color: var(--gold); font-style: normal }
+    .post-subtitle { font-size: 18px; color: rgba(236, 234, 245, 0.6); font-weight: 300; line-height: 1.6; max-width: 700px; margin-bottom: 40px }
+
+    .post-meta-bar { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 18px 0; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); margin-bottom: 64px }
+    .meta-item { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; gap: 7px }
+    .meta-divider { width: 1px; height: 14px; background: var(--border2) }
+
+    article { max-width: 760px; margin: 0 auto; padding: 0 5vw 100px }
+
+    .section-head { margin: 64px 0 24px }
+    .section-head-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 10px }
+    .section-head-label::before { content: ''; width: 16px; height: 1px; background: var(--gold) }
+    h2.section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(20px, 3vw, 28px); color: var(--text); letter-spacing: -0.01em; line-height: 1.2 }
+    h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); margin: 40px 0 14px; letter-spacing: -0.01em }
+
+    p { color: rgba(236, 234, 245, 0.78); font-size: 17px; line-height: 1.82; font-weight: 300; margin-bottom: 20px }
+    p strong { color: var(--text); font-weight: 600 }
+    p em { color: var(--gold); font-style: normal }
+    p a { color: var(--blue); text-decoration: none; border-bottom: 0.5px solid rgba(56, 189, 248, 0.3); transition: border-color 0.2s }
+    p a:hover { border-color: var(--blue) }
+
+    .components-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 24px 0 36px }
+    .component-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; transition: border-color 0.3s, transform 0.2s }
+    .component-card:hover { border-color: var(--border2); transform: translateY(-2px) }
+    .component-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 8px }
+    .component-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px }
+    .component-desc { font-size: 13px; color: rgba(236, 234, 245, 0.55); line-height: 1.55; font-weight: 300 }
+
+    .metrics-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 }
+    .metric-badge { font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 16px; background: rgba(240, 180, 41, 0.08); border: 0.5px solid rgba(240, 180, 41, 0.2); border-radius: 8px; color: var(--gold); letter-spacing: 0.05em }
+    .metric-badge span { display: block; font-size: 10px; color: var(--muted); margin-top: 2px }
+    .metric-badge.blue-badge { background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.2); color: var(--blue) }
+    .metric-badge.green-badge { background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.2); color: #4ade80 }
+
+    .results-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-family: 'DM Mono', monospace; font-size: 13px }
+    .results-table th { padding: 10px 16px; text-align: left; color: var(--gold); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--border2) }
+    .results-table td { padding: 12px 16px; color: rgba(236, 234, 245, 0.75); border-bottom: 0.5px solid var(--border) }
+    .results-table tr:hover td { background: var(--bg2) }
+    .results-table .hl { color: #4ade80; font-weight: 500 }
+    .results-table .warn { color: #f87171 }
+
+    .callout { border-left: 2px solid var(--gold); background: rgba(240, 180, 41, 0.05); border-radius: 0 var(--r) var(--r) 0; padding: 16px 20px; margin: 28px 0 }
+    .callout-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; margin-bottom: 6px; color: var(--gold) }
+    .callout p { margin: 0; font-size: 15px; line-height: 1.65; color: rgba(236, 234, 245, 0.7) }
+    .callout.blue-callout { border-left-color: var(--blue); background: rgba(56, 189, 248, 0.05) }
+    .callout.blue-callout .callout-label { color: var(--blue) }
+
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 20px 0 32px }
+    .stack-item { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--r); padding: 16px 18px }
+    .stack-category { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px }
+    .stack-pills { display: flex; flex-wrap: wrap; gap: 6px }
+    .stack-pill { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 9px; background: var(--bg3); border: 0.5px solid rgba(255,255,255,0.07); border-radius: 6px; color: rgba(236,234,245,0.7) }
+
+    .pipeline-steps { display: flex; flex-direction: column; gap: 12px; margin: 24px 0 }
+    .pipeline-step { display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start; background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--r); padding: 18px; transition: border-color 0.3s }
+    .pipeline-step:hover { border-color: var(--border2) }
+    .step-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--gold); line-height: 1 }
+    .step-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px }
+    .step-desc { font-size: 13px; color: rgba(236,234,245,0.6); line-height: 1.55; font-weight: 300 }
+
+    .proj-links-bar { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 20px }
+    .proj-btn { font-family: 'DM Mono', monospace; font-size: 12px; padding: 10px 22px; border-radius: var(--r); text-decoration: none; letter-spacing: 0.06em; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px }
+    .proj-btn.primary { background: var(--gold); color: var(--bg) }
+    .proj-btn.primary:hover { background: var(--gold2) }
+    .proj-btn.outline { border: 0.5px solid var(--border2); color: var(--text) }
+    .proj-btn.outline:hover { border-color: var(--gold); background: rgba(240, 180, 41, 0.06); color: var(--gold) }
+
+    .conclusion { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 16px; padding: 36px; margin-top: 64px }
+    .conclusion-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 14px }
+    .conclusion-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--text); margin-bottom: 12px }
+    .conclusion p { font-size: 16px; margin-bottom: 0; line-height: 1.7 }
+
+    .post-footer { max-width: 760px; margin: 0 auto; padding: 0 5vw 80px; border-top: 0.5px solid var(--border); padding-top: 40px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap }
+    .author-card { display: flex; align-items: center; gap: 14px }
+    .author-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: var(--gold) }
+    .author-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text) }
+    .author-role { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-top: 2px }
+    .back-btn { font-family: 'DM Mono', monospace; font-size: 12px; padding: 11px 22px; border: 0.5px solid var(--border2); border-radius: var(--r); color: var(--text); text-decoration: none; letter-spacing: 0.06em; transition: all 0.2s }
+    .back-btn:hover { border-color: var(--gold); background: rgba(240, 180, 41, 0.06); color: var(--gold) }
+
+    .fade { opacity: 0; transform: translateY(16px); transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) }
+    .fade.visible { opacity: 1; transform: translateY(0) }
+
+    @media(max-width:640px) {
+      .post-hero { padding: 110px 5vw 48px }
+      .post-title { font-size: clamp(24px, 7vw, 36px) }
+      article { padding: 0 5vw 60px }
+      .components-grid, .stack-grid { grid-template-columns: 1fr }
+      .metrics-row { gap: 8px }
+      .post-footer { flex-direction: column; align-items: flex-start; padding: 32px 5vw 48px }
+      .post-meta-bar { flex-direction: column; align-items: flex-start }
+      .meta-divider { display: none }
+      .results-table { font-size: 11px }
+      .results-table th, .results-table td { padding: 8px 10px }
+      .pipeline-step { grid-template-columns: 36px 1fr; gap: 10px }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="progress"></div>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">HM<span>.</span></a>
+    <a href="../index.html#projects" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      All Projects
+    </a>
+  </nav>
+
+  <div class="post-hero fade">
+    <div class="post-eyebrow">
+      <span class="tag-pill gold">Vision-Language Models</span>
+      <span class="tag-pill gold">NLP Research</span>
+      <span class="tag-pill blue">LoRA Fine-tuning</span>
+      <span class="dot"></span>
+      <span>2025</span>
+      <span class="dot"></span>
+      <span>Northeastern University</span>
+    </div>
+    <h1 class="post-title">VLM <em>Counterfactual</em> Consistency</h1>
+    <p class="post-subtitle">Research investigating whether large vision-language models truly reason about images or
+      rely on superficial pattern-matching — using counterfactual question families and a novel Consistency Score
+      metric.</p>
+    <div class="post-meta-bar">
+      <div class="meta-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2" />
+          <path d="M6.5 3.5V6.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+        Research · 2025
+      </div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">Khoury College · Northeastern University</div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">LLaVA-1.5 · InstructBLIP · LoRA · GQA</div>
+    </div>
+  </div>
+
+  <article>
+
+    <p class="fade">Standard VQA accuracy metrics hide a critical weakness: a model can score 50% on a benchmark while
+      failing basic logical reasoning. If a model answers <em>"red"</em> to <strong>"What color is the car?"</strong>,
+      it should logically answer <em>"no"</em> to <strong>"Is the car blue?"</strong> — but many state-of-the-art VLMs
+      don't.</p>
+
+    <div class="callout fade">
+      <div class="callout-label">The Research Question</div>
+      <p>Do vision-language models understand the <em>logical relationships</em> between related questions about the
+        same image, or do they simply pattern-match each question independently?</p>
+    </div>
+
+    <!-- APPROACH -->
+    <div class="section-head fade">
+      <div class="section-head-label">Approach</div>
+      <h2 class="section-title">Counterfactual question families</h2>
+    </div>
+
+    <p class="fade">For each original question, we generate a "family" of 1–3 logical variants using four intervention
+      types. The model is evaluated not just on each question individually, but on whether its answers across the whole
+      family satisfy the expected logical relations.</p>
+
+    <div class="components-grid">
+      <div class="component-card fade">
+        <div class="component-num">Type 01</div>
+        <div class="component-name">Negation</div>
+        <div class="component-desc">Yes/no questions are flipped. If the model says "yes" to the original, it must say
+          "no" to the negated form — and vice versa.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">Type 02</div>
+        <div class="component-name">Attribute Swaps</div>
+        <div class="component-desc">Color, size, or material is changed to a different value. The model must answer
+          based on the new attribute, not just recall the entity.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">Type 03</div>
+        <div class="component-name">Entailment</div>
+        <div class="component-desc">Logical implications are tested. If A is true, then B (which follows from A) should
+          also be true — the model must maintain logical soundness.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">Type 04</div>
+        <div class="component-name">Spatial Perturbations</div>
+        <div class="component-desc">Left/right, on/under, and other spatial relations are reversed. Tests whether the
+          model actually reads spatial language or guesses from priors.</div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="section-head fade">
+      <div class="section-head-label">Results</div>
+      <h2 class="section-title">Consistency Score vs. VQA Accuracy</h2>
+    </div>
+
+    <p class="fade">Evaluated on 1,000 GQA questions generating 1,961 counterfactuals total:</p>
+
+    <table class="results-table fade">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Consistency Score</th>
+          <th>VQA Accuracy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>LLaVA-1.5-7B (base)</td>
+          <td class="hl">0.6925</td>
+          <td>0.439</td>
+        </tr>
+        <tr>
+          <td>InstructBLIP-FlanT5-XL</td>
+          <td>0.6263</td>
+          <td class="hl">0.502</td>
+        </tr>
+        <tr>
+          <td>LLaVA-1.5 + LoRA</td>
+          <td>0.6598</td>
+          <td>0.493</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="fade">Pass rate by intervention type</h3>
+
+    <table class="results-table fade">
+      <thead>
+        <tr>
+          <th>Intervention</th>
+          <th>LLaVA-1.5</th>
+          <th>InstructBLIP</th>
+          <th>LLaVA + LoRA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Entailment</td>
+          <td class="hl">99.1%</td>
+          <td>90.6%</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Spatial</td>
+          <td class="hl">53.0%</td>
+          <td>27.6%</td>
+          <td>45.1%</td>
+        </tr>
+        <tr>
+          <td>Negation</td>
+          <td class="warn">14.9%</td>
+          <td>27.0%</td>
+          <td>17.5%</td>
+        </tr>
+        <tr>
+          <td>Attribute swap</td>
+          <td class="warn">6.8%</td>
+          <td class="warn">6.2%</td>
+          <td>8.6%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout blue-callout fade">
+      <div class="callout-label">Key Finding</div>
+      <p>LLaVA shows higher consistency (0.69 vs 0.63) despite lower raw accuracy — suggesting better compositional
+        reasoning. Both models fail catastrophically on attribute swaps (&lt;7%): they answer based on the
+        <em>entity</em>, not the changed <em>attribute</em>. Negation is also hard for both (15–27%).</p>
+    </div>
+
+    <!-- LORA TRAINING -->
+    <div class="section-head fade">
+      <div class="section-head-label">LoRA Fine-tuning</div>
+      <h2 class="section-title">Pairwise consistency loss</h2>
+    </div>
+
+    <p class="fade">We designed a novel <strong>pairwise consistency loss</strong> that operates on answer token
+      distributions across question families, applied during LoRA rank-8 fine-tuning:</p>
+
+    <div class="components-grid">
+      <div class="component-card fade">
+        <div class="component-num">Loss 01</div>
+        <div class="component-name">Contradiction Loss</div>
+        <div class="component-desc">Penalises the model when it agrees on answers that should logically be opposite
+          (negation pairs).</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">Loss 02</div>
+        <div class="component-name">Entailment Loss</div>
+        <div class="component-desc">Penalises the counterfactual for not answering "yes" when the original entails a
+          logical consequence.</div>
+      </div>
+      <div class="component-card fade">
+        <div class="component-num">Loss 03</div>
+        <div class="component-name">Attribute / Spatial Loss</div>
+        <div class="component-desc">Penalises similar output distributions for questions that differ only in a swapped
+          attribute or spatial relation.</div>
+      </div>
+    </div>
+
+    <p class="fade">Total training objective: <code>CE_orig + CE_cf + λ · PC_loss</code></p>
+
+    <p class="fade"><strong>Tradeoff observed:</strong> LoRA fine-tuning improves VQA accuracy (+5.4%) and attribute
+      swap reasoning (+1.8%), but hurts spatial reasoning (−7.9%) — revealing that different reasoning modes compete
+      during training. This tension itself is a meaningful finding about how VLMs learn.</p>
+
+    <!-- PIPELINE -->
+    <div class="section-head fade">
+      <div class="section-head-label">Pipeline</div>
+      <h2 class="section-title">Five sequential phases</h2>
+    </div>
+
+    <div class="pipeline-steps fade">
+      <div class="pipeline-step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-name">Counterfactual Generation</div>
+          <div class="step-desc">Converts raw GQA questions into families (original + 1–3 logical variants) by
+            dispatching on question type to apply the appropriate intervention.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-name">VLM Inference</div>
+          <div class="step-desc">Runs pretrained models on all family members. Auto-detects VRAM and falls back to 4-bit
+            quantization (QLoRA) when memory is tight — enabling inference on 8 GB GPUs.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-name">Consistency Scoring</div>
+          <div class="step-desc">Evaluates per-family scores by checking logical relations. Produces per-intervention
+            and per-question-type breakdowns for fine-grained analysis.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-name">Consistency-Aware Training</div>
+          <div class="step-desc">LoRA rank-8 fine-tuning on LLaVA-1.5 using the pairwise consistency loss alongside
+            standard cross-entropy.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-name">Generalization Evaluation</div>
+          <div class="step-desc">Validates that GQA-trained counterfactual fine-tuning transfers to VQA v2 without
+            degrading standard accuracy.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="section-head fade">
+      <div class="section-head-label">Tech Stack</div>
+      <h2 class="section-title">Models, frameworks, datasets</h2>
+    </div>
+
+    <div class="stack-grid fade">
+      <div class="stack-item">
+        <div class="stack-category">Models</div>
+        <div class="stack-pills">
+          <span class="stack-pill">LLaVA-1.5-7B</span>
+          <span class="stack-pill">InstructBLIP-FlanT5-XL</span>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-category">Frameworks</div>
+        <div class="stack-pills">
+          <span class="stack-pill">PyTorch</span>
+          <span class="stack-pill">HuggingFace Transformers</span>
+          <span class="stack-pill">PEFT (LoRA)</span>
+          <span class="stack-pill">bitsandbytes</span>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-category">Datasets</div>
+        <div class="stack-pills">
+          <span class="stack-pill">GQA</span>
+          <span class="stack-pill">VQA v2</span>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-category">Supporting</div>
+        <div class="stack-pills">
+          <span class="stack-pill">scikit-learn</span>
+          <span class="stack-pill">pandas</span>
+          <span class="stack-pill">matplotlib</span>
+          <span class="stack-pill">OpenCV</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="conclusion fade">
+      <div class="conclusion-label">Outcome</div>
+      <div class="conclusion-title">Accuracy alone doesn't tell the whole story of visual reasoning.</div>
+      <p>This work introduces a reproducible framework for probing VLM reasoning beyond accuracy metrics. The
+        Consistency Score reveals a clear gap: today's best open-source VLMs are strong at entailment but fail
+        dramatically at attribute-level reasoning and logical negation. The pairwise consistency loss shows that
+        targeted fine-tuning can close part of this gap — but at the cost of other reasoning modes, pointing to a
+        fundamental tension worth exploring further.</p>
+      <div class="proj-links-bar" style="margin-top:24px">
+        <a href="https://github.com/sujithpeddireddy-neu/vlm-counterfactual-consistency" target="_blank"
+          class="proj-btn primary">↗ View on GitHub</a>
+      </div>
+    </div>
+
+  </article>
+
+  <div class="post-footer fade">
+    <div class="author-card">
+      <div class="author-avatar">HM</div>
+      <div>
+        <div class="author-name">Hemanth Sai .M</div>
+        <div class="author-role">MS AI · Northeastern University</div>
+      </div>
+    </div>
+    <a href="../index.html#projects" class="back-btn">← Back to Projects</a>
+  </div>
+
+  <script>
+    const bar = document.getElementById('progress');
+    window.addEventListener('scroll', () => {
+      bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+    });
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.08 });
+    document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+  </script>
+</body>
+
+</html>
