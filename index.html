@@ -1853,6 +1853,47 @@
         </div>
       </div>
 
+      <div class="project-card reveal reveal-delay-2">
+        <div class="project-num">07 — MLOps</div>
+        <div class="project-title">Adaptive ML Inference Platform</div>
+        <p class="project-desc">Production MLOps system using a PPO reinforcement learning agent to dynamically route
+          video frames across YOLOv8 Nano / Small / Large — achieving 58% latency reduction (48ms → 20ms), 2.6×
+          throughput, and 42% cost savings while retaining 95%+ detection accuracy. Deployed on GKE with Airflow,
+          MLflow, and automated drift detection.</p>
+        <div class="project-tags">
+          <span class="project-tag">YOLOv8</span>
+          <span class="project-tag">Reinforcement Learning</span>
+          <span class="project-tag">Apache Airflow</span>
+          <span class="project-tag">Kubernetes</span>
+          <span class="project-tag">FastAPI</span>
+          <span class="project-tag">MLflow</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/hemanth1403/IE7374-MLOps-Adaptive-ML-Inference" target="_blank"
+            class="proj-link">↗ GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal reveal-delay-3">
+        <div class="project-num">08 — Vision-Language</div>
+        <div class="project-title">VLM Counterfactual Consistency</div>
+        <p class="project-desc">Research project probing whether LLaVA-1.5 and InstructBLIP truly reason about visual
+          content or rely on pattern-matching. Introduces counterfactual question families across four intervention types
+          (negation, attribute swaps, entailment, spatial) and a novel Consistency Score metric. LoRA fine-tuning with a
+          pairwise consistency loss improves VQA accuracy by 5.4%.</p>
+        <div class="project-tags">
+          <span class="project-tag">LLaVA-1.5</span>
+          <span class="project-tag">InstructBLIP</span>
+          <span class="project-tag">LoRA / PEFT</span>
+          <span class="project-tag">GQA</span>
+          <span class="project-tag">HuggingFace</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/sujithpeddireddy-neu/vlm-counterfactual-consistency" target="_blank"
+            class="proj-link">↗ GitHub</a>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -2130,7 +2171,7 @@
           countTo('c1', 4, 1000, '+');
           countTo('c2', 5, 1200);
           countTo('c3', 1, 800);
-          countTo('c4', 6, 1400);
+          countTo('c4', 8, 1400);
         }, 600);
         heroObs.disconnect();
       }
